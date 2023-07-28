@@ -34,3 +34,6 @@ def get_students(request):
         return JsonResponse(student_list, safe=False)
 
     return JsonResponse({'message': 'Invalid request method!'}, status=405)
+
+def home(request):
+    return render(request, 'home.html', {})

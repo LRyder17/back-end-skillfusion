@@ -116,6 +116,9 @@ __pypackages__/
 celerybeat-schedule
 celerybeat.pid
 
+# Google API credentials
+credentials/credentials.json
+
 # SageMath parsed files
 *.sage.py
 
