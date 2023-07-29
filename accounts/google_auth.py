@@ -1,10 +1,15 @@
-import json
+import os
 from oauth2client.client import OAuth2WebServerFlow
+from dotenv import load_dotenv
 
-with open('/Users/SRyder/Documents/ada/Core/Capstone/back-end-skillfusion/credentials/credentials.json', 'r') as file:
-    credentials = json.load(file)
+# Load the environment variables
+load_dotenv()
 
-flow = OAuth2WebServerFlow(client_id=credentials['web']['client_id'],
-                        client_secret=credentials['web']['client_secret'],
-                        scope='https://www.googleapis.com/auth/calendar',
-                        redirect_uri='http://localhost:8000/oauth2callback/')
+# Get the credentials from environment variables
+client_id = os.getenv("GOOGLE_CLIENT_ID")
+client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+
+flow = OAuth2WebServerFlow(client_id=client_id,
+                           client_secret=client_secret,
+                           scope='https://www.googleapis.com/auth/calendar',
+                           redirect_uri='http://localhost:8000/oauth2callback/')
