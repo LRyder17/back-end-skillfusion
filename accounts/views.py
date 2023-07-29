@@ -1,23 +1,27 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.http import HttpResponseRedirect
+from .google_auth import flow
+from oauth2client.client import OAuth2Credentials
 from django.views.decorators.csrf import csrf_exempt
-from .models import Student  # Import the Student model instead of User
+from .models import Student, Profile  
+from django.contrib.auth.models import User
 
 @csrf_exempt
-def create_student(request):  # Rename the view function to create_student
+def create_student(request):  
     if request.method == 'POST':
         data = request.POST
         first_name = data.get('first_name')
         last_name = data.get('last_name')
-        age = data.get('age')  # Rename the 'date_of_birth' field to 'age'
-        grade = data.get('grade')  # Add 'grade' field
+        age = data.get('age')  
+        grade = data.get('grade')  
 
         if first_name and last_name and age and grade:
-            student = Student.objects.create(  # Use Student instead of User
+            student = Student.objects.create(
                 first_name=first_name,
                 last_name=last_name,
-                age=age,  # Update the field name
-                grade=grade  # Add the 'grade' field
+                age=age,  
+                grade=grade  
             )
 
             return JsonResponse({'message': 'Student created successfully!'})
@@ -37,3 +41,26 @@ def get_students(request):
 
 def home(request):
     return render(request, 'home.html', {})
+
+def following_list(request, user_id):
+    user = User.objects.get(id=user_id)
+    profiles = user.profile.follows.all()
+    return render(request, 'profile_list.html', {'profiles': profiles})
+
+def follower_list(request, user_id):
+    user = User.objects.get(id=user_id)
+    profiles = user.profile.followed_by.all()
+    return render(request, 'profile_list.html', {'profiles': profiles})
+
+def profile_list(request):
+    profiles = Profile.objects.exclude(user=request.user)
+    return render(request, 'profile_list.html', {"profiles": profiles})
+
+
+def oauth2callback(request):
+    auth_code = request.GET.get('code')
+    credentials = flow.step2_exchange(auth_code)
+    request.user.profile.access_token = credentials.access_token
+    request.user.profile.refresh_token = credentials.refresh_token
+    request.user.profile.save()
+    return HttpResponseRedirect('/')

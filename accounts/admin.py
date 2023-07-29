@@ -11,6 +11,7 @@ admin.site.register(Student)
 
 class UserAdmin(admin.ModelAdmin):
     model = User
+    # fields = ["username", "first_name", "last_name", "email", "password"]
     fields = ["username"]
     inlines = [ProfileInline]
 

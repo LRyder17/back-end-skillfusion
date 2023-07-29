@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Profile List - Skill Fusion
+{% endblock %}
+
+{% block content %}
+    <h2>Profile List</h2>
+<br/>
+
+{% if profiles %}
+    {% for profile in profiles %}
+        Username: {{ profile.user.username}}
+        Link: @{{ profile.user.username|lower }}
+        <br><br/>
+    {% endfor %}
+
+{% endif %}
+
+{% endblock %}
