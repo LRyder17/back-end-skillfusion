@@ -31,7 +31,8 @@ SECRET_KEY = 'django-insecure-y2y)m2u2vpxfl3%c#-zn0tqfwofq$un@9j=k%0jo8p71^7w^-0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['skillfusion-db.onrender.com']
+
 
 
 # Application definition
