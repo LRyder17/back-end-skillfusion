@@ -9,6 +9,7 @@ class Profile(models.Model):
                                     related_name="followed_by",
                                     symmetrical=False,
                                     blank=True)
+    date_modified = models.DateTimeField(User, auto_now=True)
     access_token = models.CharField(max_length=500, null=True, blank=True)
     refresh_token = models.CharField(max_length=500, null=True, blank=True)
     

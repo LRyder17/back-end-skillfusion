@@ -1,20 +1,43 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 Profile List - Skill Fusion
 {% endblock %}
 
 {% block content %}
-    <h2>Profile List</h2>
+<h2>Profile List</h2>
 <br/>
 
 {% if profiles %}
     {% for profile in profiles %}
-        Username: {{ profile.user.username}}
-        Link: @{{ profile.user.username|lower }}
-        <br><br/>
+        <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{% static 'images/generic_profile_pic.png' %}" 
+                    class="img-fluid rounded-start" 
+                    alt="Profile Picture">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title"> {{ profile.user.username }} </h5>
+                        <p class="card-text">
+                            <a href="{% url 'profile' profile.user.id %}">
+                                @{{ profile.user.username|lower }}
+                            </a>
+                        </p>
+                        <br/><br/>
+                        <p class="card-text">
+                            <small class="text-body-secondary">
+                                {{ profile.date_modified }}
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/><br/>
     {% endfor %}
-
 {% endif %}
 
 {% endblock %}

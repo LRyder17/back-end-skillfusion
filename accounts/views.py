@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from .google_auth import flow
@@ -6,6 +7,7 @@ from oauth2client.client import OAuth2Credentials
 from django.views.decorators.csrf import csrf_exempt
 from .models import Student, Profile  
 from django.contrib.auth.models import User
+
 
 @csrf_exempt
 def create_student(request):  
@@ -53,9 +55,21 @@ def follower_list(request, user_id):
     return render(request, 'profile_list.html', {'profiles': profiles})
 
 def profile_list(request):
-    profiles = Profile.objects.exclude(user=request.user)
-    return render(request, 'profile_list.html', {"profiles": profiles})
-
+    if request.user.is_authenticated:
+        profiles = Profile.objects.exclude(user=request.user)
+        return render(request, 'profile_list.html', {"profiles": profiles})
+    else:
+        messages.success(request, ("You must be logged in to view this page"))
+        return redirect('home')
+    
+def profile(request, pk):
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user_id=pk)
+        return render(request, "profile.html", {"profile": profile})
+    else:
+        messages.success(request,("You must be logged in to view this page"))
+        return redirect('home')
+ 
 
 def oauth2callback(request):
     auth_code = request.GET.get('code')
