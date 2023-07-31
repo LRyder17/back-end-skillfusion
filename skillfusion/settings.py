@@ -11,24 +11,29 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import environ 
 import dj_database_url
+
+
+env = environ.Env()
+environ.Env.read_env()
 # import os
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgres://postgres:postgres@localhost:5432/skillfusion_development')
+    'default': dj_database_url.parse(env('DATABASE_URL'))
 }
 
 # Adding another database configuration using django.db.backends.postgresql
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'skillfusion_development',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'Port': '',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'skillfusion_development',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'localhost',
+#         'Port': '',
+#     }
+# }
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,7 +53,8 @@ SECRET_KEY = 'django-insecure-y2y)m2u2vpxfl3%c#-zn0tqfwofq$un@9j=k%0jo8p71^7w^-0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'skillfusion-db.onrender.com']
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'skillfusion-db.onrender.com']
+ALLOWED_HOSTS = ['*']
 
 
 
