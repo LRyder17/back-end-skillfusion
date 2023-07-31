@@ -59,7 +59,7 @@ def home(request):
         comments = Comment.objects.all().order_by("-created_at")
         return render(request, 'home.html', {"comments": comments, "form": form})
     else:
-        comments = Comment.objects.all().order_by("-created_at")
+        comments = []
         return render(request, 'home.html', {"comments": comments})
 
 def following_list(request, user_id):
