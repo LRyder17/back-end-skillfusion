@@ -43,7 +43,7 @@ def get_students(request):
 
 def home(request):
     # if request.user.is_authenticated:
-    comments = Comment.objects.all().order_by("-created_at")
+    comments = Comment.objects.all()
     return render(request, 'home.html', {"comments":comments})
 
 def following_list(request, user_id):
