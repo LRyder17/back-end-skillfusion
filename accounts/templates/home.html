@@ -7,8 +7,7 @@ Home - Skill Fusion
 {% block content %}
     <h1>Hello World!</h1>
 
-    {% comment %} {% for comment in comments %} {% endcomment %}
-        {% comment %} {{comment}}<br/><br/> {% endcomment %}
-
-    {% comment %} {% endfor %} {% endcomment %}
+    {% for comment in comments %}
+        {{comment}}<br/><br/>
+    {% endfor %}
 {% endblock %}
