@@ -19,13 +19,15 @@ DATABASES = {
 }
 
 # Adding another database configuration using django.db.backends.postgresql
-DATABASES['second_db'] = {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'skillfusion_development',
-    'USER': 'postgres',
-    'PASSWORD': 'postgres',
-    'HOST': 'localhost',
-    'PORT': '',  # The 'P' in 'PORT' should be lowercase
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'skillfusion_development',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'Port': '',
+    }
 }
 
 
