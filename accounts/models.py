@@ -38,3 +38,18 @@ class Student(models.Model):
 
     class Meta:
         db_table = 'student' 
+
+class Comment(models.Model):
+    user = models.ForeignKey(
+        User, related_name="comments",
+        on_delete=models.DO_NOTHING
+    )
+    body = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return(
+            f"{self.user} "
+            f"{self.created_at:%Y-%m-%d %H:%M}"
+            f"{self.body}"
+        )
