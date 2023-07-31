@@ -45,14 +45,22 @@ def home(request):
     return render(request, 'home.html', {})
 
 def following_list(request, user_id):
-    user = User.objects.get(id=user_id)
-    profiles = user.profile.follows.all()
-    return render(request, 'profile_list.html', {'profiles': profiles})
+    if request.user.is_authenticated:
+        user = User.objects.get(id=user_id)
+        profiles = user.profile.follows.all()
+        return render(request, 'profile_list.html', {'profiles': profiles})
+    else:
+        messages.success(request, ("You must be logged in to view this page"))
+        return redirect('home')
 
 def follower_list(request, user_id):
-    user = User.objects.get(id=user_id)
-    profiles = user.profile.followed_by.all()
-    return render(request, 'profile_list.html', {'profiles': profiles})
+    if request.user.is_authenticated:
+        user = User.objects.get(id=user_id)
+        profiles = user.profile.followed_by.all()
+        return render(request, 'profile_list.html', {'profiles': profiles})
+    else:
+        messages.success(request, ("You must be logged in to view this page"))
+        return redirect('home')
 
 def profile_list(request):
     if request.user.is_authenticated:
