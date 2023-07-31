@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from .google_auth import flow
 from oauth2client.client import OAuth2Credentials
 from django.views.decorators.csrf import csrf_exempt
-from .models import Student, Profile  
+from .models import Student, Profile, Comment  
 from django.contrib.auth.models import User
 
 
@@ -42,7 +42,9 @@ def get_students(request):
     return JsonResponse({'message': 'Invalid request method!'}, status=405)
 
 def home(request):
-    return render(request, 'home.html', {})
+    # if request.user.is_authenticated:
+    comments = Comment.objects.all()
+    return render(request, 'home.html', {"comments":comments})
 
 def following_list(request, user_id):
     if request.user.is_authenticated:
