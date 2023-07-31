@@ -18,6 +18,16 @@ DATABASES = {
     'default': dj_database_url.config(default='postgres://postgres:postgres@localhost:5432/skillfusion_development')
 }
 
+# Adding another database configuration using django.db.backends.postgresql
+DATABASES['second_db'] = {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'skillfusion_development',
+    'USER': 'postgres',
+    'PASSWORD': 'postgres',
+    'HOST': 'localhost',
+    'PORT': '',  # The 'P' in 'PORT' should be lowercase
+}
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -88,16 +98,16 @@ WSGI_APPLICATION = 'skillfusion.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'skillfusion_development',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'Port': '',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'skillfusion_development',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'localhost',
+#         'Port': '',
+#     }
+# }
 
 
 # Password validation

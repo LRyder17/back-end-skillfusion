@@ -140,7 +140,7 @@ def register_user(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
             # first_name = form.cleaned_data['first_name']
-            # second_name = form.cleaned_data['second_name']
+            # last_name = form.cleaned_data['second_name']
             # email = form.cleaned_data['email']
             # Log in User
             user = authenticate(username=username, password=password)
@@ -148,3 +148,10 @@ def register_user(request):
             messages.success(request,("Welcome to SkillFusion! You have successfully registered."))
             return redirect('home')
     return render(request, 'register.html', {'form': form})
+
+def update_user(request):
+    if request.user.is_authenticated:
+        return render(request, "update_user.html", {})
+    else:
+        messages.success(request, ("You must be logged in to update your profile!"))
+        return redirect('home')
