@@ -42,20 +42,11 @@ def get_students(request):
     return JsonResponse({'message': 'Invalid request method!'}, status=405)
 
 def home(request):
-    # Create or fetch actual User instances
-    # user1 = User.objects.get_or_create(username="User1")[0]
-    # user2 = User.objects.get_or_create(username="User2")[0]
-    # user3 = User.objects.get_or_create(username="User3")[0]
-
-    # Creating comment objects for testing purposes (mock data)
-    comment1 = Comment(user="sryder", body="This is the first comment.", created_at="2023-07-31 15:30")
-    comment2 = Comment(user="RAvery", body="This is the second comment.", created_at="2023-07-31 15:45")
-    comment3 = Comment(user="Eden", body="This is the third comment.", created_at="2023-07-31 16:00")
-
-    # Storing the comments in a list (you can use a dictionary if needed)
-    comments = [comment1, comment2, comment3]
-
-    return render(request, 'home.html', {"comments": comments})
+    if request.user.is_authenticated:
+        comments = Comment.objects.all()
+        return render(request, 'home.html', {"comments":comments})
+    else:
+        return render(request, 'home.html', {})
 
 def following_list(request, user_id):
     if request.user.is_authenticated:
