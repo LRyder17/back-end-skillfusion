@@ -7,10 +7,12 @@ from oauth2client.client import OAuth2Credentials
 from django.views.decorators.csrf import csrf_exempt
 from .models import Student, Profile, Comment  
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from .forms import CommentForm, UserRegistrationForm
+from django.contrib.auth.models import User
+
 
 
 @csrf_exempt
@@ -159,7 +161,17 @@ def register_user(request):
 
 def update_user(request):
     if request.user.is_authenticated:
-        return render(request, "update_user.html", {})
+        current_user = User.objects.get(id=request.user.id)
+        form = UserRegistrationForm(request.POST or None, instance=current_user)
+        if form.is_valid():
+            form.save()
+            
+            update_session_auth_hash(request, current_user)
+
+            messages.success(request, ("Your profile information has been updated"))
+            return redirect(reverse('profile', kwargs={'pk': request.user.profile.pk}))
+
+        return render(request, "update_user.html", {'form': form})
     else:
         messages.success(request, ("You must be logged in to update your profile!"))
         return redirect('home')
