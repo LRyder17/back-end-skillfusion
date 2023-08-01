@@ -1,5 +1,5 @@
 from django import forms 
-from .models import Comment
+from .models import Comment, Profile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -45,5 +45,9 @@ class UserRegistrationForm(UserCreationForm):
         self.fields['password2'].label = ''
         self.fields['password2'].help_text = '<span class="form-text text-muted small">Enter the same password for. They must be exactly the same.'
 
+class ProfilePicForm(forms.ModelForm):
+    profile_image = forms.ImageField(label="Profile Picture")
 
-
+    class Meta:
+        model = Profile
+        fields = ('profile_image', )
