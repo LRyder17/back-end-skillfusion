@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
@@ -65,7 +65,7 @@ def home(request):
 def following_list(request, user_id):
     if request.user.is_authenticated:
         user = User.objects.get(id=user_id)
-        profiles = user.profile.follows.all()
+        profiles = user.profile.follows.exclude(user=user)
         return render(request, 'profile_list.html', {'profiles': profiles})
     else:
         messages.success(request, ("You must be logged in to view this page"))
@@ -74,11 +74,12 @@ def following_list(request, user_id):
 def follower_list(request, user_id):
     if request.user.is_authenticated:
         user = User.objects.get(id=user_id)
-        profiles = user.profile.followed_by.all()
+        profiles = user.profile.followed_by.exclude(user=user)
         return render(request, 'profile_list.html', {'profiles': profiles})
     else:
         messages.success(request, ("You must be logged in to view this page"))
         return redirect('home')
+    
 def profile_list(request):
     if request.user.is_authenticated:
         profiles = Profile.objects.exclude(user=request.user)
@@ -153,7 +154,7 @@ def register_user(request):
             user = authenticate(username=username, password=password)
             login(request, user)
             messages.success(request,("Welcome to SkillFusion! You have successfully registered."))
-            return redirect('home')
+            return redirect(reverse('profile', kwargs={'pk': user.profile.pk}))
     return render(request, 'register.html', {'form': form})
 
 def update_user(request):
@@ -162,3 +163,4 @@ def update_user(request):
     else:
         messages.success(request, ("You must be logged in to update your profile!"))
         return redirect('home')
+    
