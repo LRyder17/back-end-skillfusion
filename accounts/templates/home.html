@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Home - Skill Fusion{% endblock %}
 
@@ -10,6 +11,18 @@
 <br/>
     {% for comment in comments %}
         <div class="alert alert-info" role="alert">
+            <div class="container">
+                <div class="row">
+                    <div class="col-1"> 
+                        {% if comment.user.profile.profile_image %}
+                        <img src="{{ comment.user.profile.profile_image.url }}" width=50 
+                        height=50 class="rounded-circle" alt="{{ profile.profile.username }}">
+                        {% else %}
+                        <img src="{% static 'images/generic_profile_pic.png' %}" width=50 
+                        height=50 class="rounded-circle" alt="{{ profile.profile.username }}">
+                        {% endif %}
+                    </div>
+                    <div class="col-10">       
             {{ comment.body }}<br/>
             <small class="text muted">
                 ({{comment.created_at}})
@@ -17,6 +30,10 @@
             </small>
         </div>
         <br/>
+ 
+</div>
+</div>
+</div>
     {% endfor %}
 
 </div>
