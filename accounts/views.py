@@ -166,7 +166,7 @@ def update_user(request):
         # Get forms
         user_form = UserRegistrationForm(request.POST or None, request.FILES or None, instance=current_user)
         profile_form = ProfilePicForm(request.POST or None, request.FILES or None, instance=profile_user)
-        if user_form.is_valid() and profile_form is valid():
+        if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
             # Refreshes the user's session to prevent them being logged out 
