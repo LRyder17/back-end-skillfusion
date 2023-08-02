@@ -12,33 +12,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .forms import CommentForm, UserRegistrationForm, ProfilePicForm
+from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm
 from django.contrib.auth.models import User
 
-
-
-@csrf_exempt
-def create_student(request):  
-    if request.method == 'POST':
-        data = request.POST
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        age = data.get('age')  
-        grade = data.get('grade')  
-
-        if first_name and last_name and age and grade:
-            student = Student.objects.create(
-                first_name=first_name,
-                last_name=last_name,
-                age=age,  
-                grade=grade  
-            )
-
-            return JsonResponse({'message': 'Student created successfully!'})
-        else:
-            return JsonResponse({'message': 'All fields are required!'}, status=400)
-
-    return JsonResponse({'message': 'Invalid request method!'}, status=405)
 
 def get_students(request):
     if request.method == 'GET':
@@ -83,7 +59,7 @@ def follower_list(request, user_id):
     else:
         messages.success(request, ("You must be logged in to view this page"))
         return redirect('home')
-    
+
 def profile_list(request):
     if request.user.is_authenticated:
         profiles = Profile.objects.exclude(user=request.user)
@@ -189,22 +165,22 @@ def create_course(request):
         messages.success(request, ("You must be logged in to add a course!"))
         return redirect('home')
     
-# def create_course(request):
-#     course_form = CourseForm()
-#     if request.method == "POST":
-#         course_form = CourseForm(request.POST)
-#         classmeeting_formset = ClassMeetingFormSet(request.POST, prefix='class_meetings')
-#         if course_form.is_valid() and classmeeting_formset.is_valid():
-#             course = course_form.save(commit=False)
-#             course.teacher = request.user
-#             course.save()
-#             classmeeting_formset.instance = course
-#             classmeeting_formset.save()
-#             return redirect('courses') 
-#     else:
-#         course_form = CourseForm()
-#         classmeeting_formset = ClassMeetingFormSet(prefix='class_meetings')
-#     return render(request, 'create_course.html', {'course_form': course_form, 'classmeeting_formset': classmeeting_formset})
+def create_course(request):
+    course_form = CourseForm()
+    if request.method == "POST":
+        course_form = CourseForm(request.POST)
+        # classmeeting_formset = ClassMeetingFormSet(request.POST, prefix='class_meetings')
+        if course_form.is_valid(): # and classmeeting_formset.is_valid():
+            course = course_form.save(commit=False)
+            course.teacher = request.user
+            course.save()
+            # classmeeting_formset.instance = course
+            # classmeeting_formset.save()
+            return redirect('courses') 
+    else:
+        course_form = CourseForm()
+        classmeeting_formset = ClassMeetingFormSet(prefix='class_meetings')
+    return render(request, 'create_course.html', {'course_form': course_form, 'classmeeting_formset': classmeeting_formset})
 
     
 # def add_course_to_calendar(request, course_id):

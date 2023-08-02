@@ -12,11 +12,13 @@ urlpatterns = [
     path('register/', views.register_user, name='register'),
     path('update_user/', views.update_user, name='update_user'),
     path('create_course/', views.create_course, name='create_course'),
+    path('courses/', views.course_list, name='course_list'),
+    path('courses/<int:pk>/', views.course_detail, name='course_detail'),
+    path('courses/subject/<str:subject>/', views.courses_by_subject, name='courses_by_subject'),
+
 ]
-    # path('courses/<int:course_id>', views.course, name='course')
     # path('courses/<int:course_id>/add_to_calendar/', add_course_to_calendar, name='add_to_calendar'),
 
-    # path('create_student/', views.create_student, name='create_student'),
     # path('students/', views.get_students, name='get_students'),
 
 
