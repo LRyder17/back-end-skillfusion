@@ -4,8 +4,10 @@ from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from .google_auth import flow
 from oauth2client.client import OAuth2Credentials
+# from googleapiclient.discovery import build
+# from google.oauth2 import service_account
 from django.views.decorators.csrf import csrf_exempt
-from .models import Student, Profile, Comment  
+from .models import Student, Profile, Comment, Course  
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
@@ -179,4 +181,67 @@ def update_user(request):
     else:
         messages.success(request, ("You must be logged in to update your profile!"))
         return redirect('home')
+    
+def create_course(request):
+    if request.user.is_authenticated:
+        return render(request, "create_course.html", {})
+    else:
+        messages.success(request, ("You must be logged in to add a course!"))
+        return redirect('home')
+    
+# def create_course(request):
+#     course_form = CourseForm()
+#     if request.method == "POST":
+#         course_form = CourseForm(request.POST)
+#         classmeeting_formset = ClassMeetingFormSet(request.POST, prefix='class_meetings')
+#         if course_form.is_valid() and classmeeting_formset.is_valid():
+#             course = course_form.save(commit=False)
+#             course.teacher = request.user
+#             course.save()
+#             classmeeting_formset.instance = course
+#             classmeeting_formset.save()
+#             return redirect('courses') 
+#     else:
+#         course_form = CourseForm()
+#         classmeeting_formset = ClassMeetingFormSet(prefix='class_meetings')
+#     return render(request, 'create_course.html', {'course_form': course_form, 'classmeeting_formset': classmeeting_formset})
+
+    
+# def add_course_to_calendar(request, course_id):
+#     # Load the user's OAuth credentials
+#     credentials = service_account.Credentials.from_authorized_user_file('credentials/credentials.json')
+    
+#     # Build the service
+#     service = build('calendar', 'v3', credentials=credentials)
+    
+#     # Get the course
+#     course = Course.objects.get(id=course_id)
+    
+#     # Define the event
+#     event = {
+#       'summary': course.name,
+#       'location': 'Online',
+#       'description': course.description,
+#       'start': {
+#         'dateTime': course.start_time.isoformat(),
+#         'timeZone': 'America/Los_Angeles',
+#       },
+#       'end': {
+#         'dateTime': course.end_time.isoformat(),
+#         'timeZone': 'America/Los_Angeles',
+#       },
+#       'reminders': {
+#         'useDefault': False,
+#         'overrides': [
+#           {'method': 'email', 'minutes': 24 * 60},
+#           {'method': 'popup', 'minutes': 10},
+#         ],
+#       },
+#     }
+    
+#     # Call the Calendar API to create the event
+#     event = service.events().insert(calendarId='primary', body=event).execute()
+    
+#     # Render some response
+#     return render(request, 'course_added_to_calendar.html', {'course': course})
     

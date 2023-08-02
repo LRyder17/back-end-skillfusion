@@ -1,5 +1,6 @@
 from django import forms 
-from .models import Comment, Profile
+# from django.forms import inlineformset_factory
+from .models import Comment, Profile, Course
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -51,3 +52,36 @@ class ProfilePicForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('profile_image', )
+
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['title', 'subject', 'description', 'level_of_difficulty', 'duration_in_weeks', 'class_frequency', 'teacher']
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Enter title of course'}),
+            'subject': forms.TextInput(attrs={'placeholder': 'Enter course subject'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Enter course description'}),
+            'level_of_difficulty': forms.Select(attrs={'placeholder': 'Select difficulty level'}),
+            'duration_in_weeks': forms.NumberInput(attrs={'placeholder': 'Enter course length in weeks'}),
+            'class_frequency': forms.NumberInput(attrs={'placeholder': 'Enter how often the class will meet in a week'}),
+            'teacher': forms.Select(attrs={'placeholder': 'Select a teacher'}),
+        }
+
+
+# class ClassMeetingForm(forms.ModelForm):
+#     class Meta:
+#         model = ClassMeetings
+#         fields = ['meeting_type', 'date', 'start_time', 'end_time', 'location', 'meeting_link', 'description']
+#         widgets = {
+#             'meeting_type': forms.Select(attrs={'placeholder': 'Select meeting type'}),
+#             'date': forms.DateInput(attrs={'placeholder': 'Select date'}),
+#             'start_time': forms.TimeInput(attrs={'placeholder': 'Select start time'}),
+#             'end_time': forms.TimeInput(attrs={'placeholder': 'Select end time'}),
+#             'location': forms.TextInput(attrs={'placeholder': 'Enter location'}),
+#             'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
+#             'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
+#         }
+
+
+
+# ClassMeetingFormSet = inlineformset_factory(Course, ClassMeetings, form=ClassMeetingForm, extra=1)
