@@ -70,7 +70,7 @@ class Course(models.Model):
     )
     rating = models.DecimalField(max_digits=2, decimal_places=1, validators=[MinValueValidator(0), MaxValueValidator(5)], null=True, blank=True)
     enrolled_students_count = models.PositiveIntegerField(default=0)
-    course_image = models.ImageField(upload_to='course_images/', null=True, blank=True)
+    course_image = models.ImageField(upload_to='images/', null=True, blank=True)
     class_date = models.DateField(null=True, blank=True)
     class_time = models.TimeField(null=True, blank=True)
 

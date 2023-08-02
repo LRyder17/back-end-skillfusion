@@ -12,8 +12,11 @@ admin.site.register(Student)
 class UserAdmin(admin.ModelAdmin):
     model = User
     fields = ["username", "first_name", "last_name", "email", "password"]
-    # fields = ["username"]
+    readonly_fields = ["enrolled_courses"]
     inlines = [ProfileInline]
+
+    def enrolled_courses(self, obj):
+        return ", ".join([course.title for course in obj.enrolled_courses.all()])
 
 admin.site.unregister(User)
 
