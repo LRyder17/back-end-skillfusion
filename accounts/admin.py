@@ -19,6 +19,7 @@ class UserAdmin(admin.ModelAdmin):
 
     def enrolled_courses(self, obj):
         return ", ".join([course.title for course in obj.enrolled_courses.all()])
+    enrolled_courses.short_description = 'Enrolled Courses'
 
 admin.site.unregister(User)
 

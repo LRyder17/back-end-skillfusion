@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 # Create User profile model
 class Profile(models.Model):
@@ -39,71 +39,11 @@ def create_profile(sender, instance, created, **kwargs):
 post_save.connect(create_profile, sender=User)
 
 class Course(models.Model):
-    LEVEL_CHOICES = [
-        ('B', 'Beginner'),
-        ('I', 'Intermediate'),
-        ('A', 'Advanced'),
-    ]
-
+    enroll = models.ManyToManyField("self",
+                                    related_name="students_enrolled")
     title = models.CharField(max_length=200)
     subject = models.CharField(max_length=200)
     description = models.TextField()
-    level_of_difficulty = models.CharField(max_length=1, choices=LEVEL_CHOICES)
-    duration_in_weeks = models.PositiveIntegerField(help_text="Enter length of the course in weeks.")
-    class_frequency = models.PositiveIntegerField(help_text="Enter how often the class will meet per week.")
-    max_students = models.PositiveIntegerField(null=True, blank=True, help_text="Enter maximum number of students. Leave blank for open enrollment.")
-    open_enrollment = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    teacher = models.ForeignKey(
-        User, related_name="teaching_courses",
-        on_delete=models.CASCADE,
-        null=True, blank=True
-    )
-    students = models.ManyToManyField(
-        User, related_name="enrolled_courses",
-        blank=True
-    )
-    rating = models.DecimalField(max_digits=2, decimal_places=1, validators=[MinValueValidator(0), MaxValueValidator(5)], null=True, blank=True)
-    enrolled_students_count = models.PositiveIntegerField(default=0)
-    course_image = models.ImageField(upload_to='images/', null=True, blank=True)
-    class_date = models.DateField(null=True, blank=True)
-    class_time = models.TimeField(null=True, blank=True)
-
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        db_table = 'course'
-
-    def save(self, *args, **kwargs):
-        if self.max_students and self.enrolled_students_count >= self.max_students:
-            self.open_enrollment = False
-        super().save(*args, **kwargs)
-
-    
-# class ClassMeetings(models.Model):
-#     MEETING_TYPES = [
-#         ('ONLINE', 'Online'),
-#         ('IN_PERSON', 'In-person'),
-#         ('HYBRID', 'Hybrid'),
-#     ]
-#     course = models.ForeignKey(Course, related_name='class_meetings', on_delete=models.CASCADE)
-#     meeting_type = models.CharField(max_length=10, choices=MEETING_TYPES, default='ONLINE')
-#     date = models.DateField()
-#     start_time = models.TimeField()
-#     end_time = models.TimeField()
-#     location = models.CharField(max_length=255, blank=True, null=True)
-#     meeting_link = models.URLField(blank=True, null=True)
-#     description = models.TextField(blank=True, null=True)
-
-#     class Meta:
-#         verbose_name = "Class Meeting"
-#         verbose_name_plural = "Class Meetings"
-    
-#     def __str__(self):
-#         return f"{self.course.course_subject} - {self.date} - {self.start_time} to {self.end_time}"
 
 
 class Comment(models.Model):

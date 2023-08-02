@@ -1,16 +1,28 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
 
 <div class="col-md-6 offset-md-3">
 <h1>Create Course</h1>
 <br/>
-<form method ="POST" action="">
+<form class="row g-3" method="POST">
     {% csrf_token %}
-    {{form.as_p}}
-    <br/>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-
+    <div class="col-md-6">
+      <label for="id_title" class="form-label">Title</label>
+      <input type="text" class="form-control" id="id_title" name="title" placeholder="Enter title of course">
+    </div>
+    <div class="col-md-6">
+      <label for="id_subject" class="form-label">Subject</label>
+      <input type="text" class="form-control" id="id_subject" name="subject" placeholder="Enter course subject">
+    </div>
+    <div class="col-12">
+      <label for="id_description" class="form-label">Description</label>
+      <textarea class="form-control" id="id_description" name="description" placeholder="Enter course description"></textarea>
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Create Course</button>
+    </div>
+  </form>
+  
 </div>
 {% endblock %}

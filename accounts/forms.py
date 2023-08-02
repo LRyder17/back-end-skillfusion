@@ -1,5 +1,5 @@
 from django import forms 
-# from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory
 from .models import Comment, Profile, Course
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -53,18 +53,22 @@ class ProfilePicForm(forms.ModelForm):
         model = Profile
         fields = ('profile_image', )
 
+class CourseImageForm(forms.ModelForm):
+    course_image = forms.ImageField(label="Course Image")
+
+    class Meta:
+        model = Course
+        fields = ('course_image', )
+
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['title', 'subject', 'description', 'level_of_difficulty', 'duration_in_weeks', 'class_frequency', 'teacher']
+        fields = ['title', 'subject', 'description']
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Enter title of course'}),
             'subject': forms.TextInput(attrs={'placeholder': 'Enter course subject'}),
             'description': forms.Textarea(attrs={'placeholder': 'Enter course description'}),
-            'level_of_difficulty': forms.Select(attrs={'placeholder': 'Select difficulty level'}),
-            'duration_in_weeks': forms.NumberInput(attrs={'placeholder': 'Enter course length in weeks'}),
-            'class_frequency': forms.NumberInput(attrs={'placeholder': 'Enter how often the class will meet in a week'}),
-            'teacher': forms.Select(attrs={'placeholder': 'Select a teacher'}),
+
         }
 
 
@@ -81,7 +85,15 @@ class CourseForm(forms.ModelForm):
 #             'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
 #             'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
 #         }
-
+#         required = {
+#             'meeting_type': False,
+#             'date': False,
+#             'start_time': False,
+#             'end_time': False,
+#             'location': False,
+#             'meeting_link': False,
+#             'description': False,
+#         }
 
 
 # ClassMeetingFormSet = inlineformset_factory(Course, ClassMeetings, form=ClassMeetingForm, extra=1)
