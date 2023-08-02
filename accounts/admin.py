@@ -11,7 +11,7 @@ admin.site.register(Student)
 
 class UserAdmin(admin.ModelAdmin):
     model = User
-    fields = ["username", "first_name", "last_name", "email", "password"]
+    fields = ["username", "first_name", "last_name", "email", "password", "is_teacher"]
     readonly_fields = ["enrolled_courses"]
     inlines = [ProfileInline]
 
@@ -21,7 +21,6 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.unregister(User)
 
 admin.site.register(User, UserAdmin)
-# admin.site.register(Profile)
 
 admin.site.register(Comment)
 

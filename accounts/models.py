@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 # Create User profile model
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_teacher = models.BooleanField(default=False)
     follows = models.ManyToManyField("self",
                                     related_name="followed_by",
                                     symmetrical=False,
@@ -14,6 +15,14 @@ class Profile(models.Model):
     profile_image = models.ImageField(null=True, blank=True, upload_to="images/")
     access_token = models.CharField(max_length=500, null=True, blank=True)
     refresh_token = models.CharField(max_length=500, null=True, blank=True)
+
+    @property
+    def enrolled_courses(self):
+        return self.user.enrolled_courses.all()
+
+    @property
+    def teaching_courses(self):
+        return self.user.teaching_courses.all()
     
     def __str__(self):
         return self.user.username
