@@ -7,7 +7,7 @@ from oauth2client.client import OAuth2Credentials
 # from googleapiclient.discovery import build
 # from google.oauth2 import service_account
 from django.views.decorators.csrf import csrf_exempt
-from .models import Student, Profile, Comment, Course  
+from .models import Profile, Comment, Course  
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
