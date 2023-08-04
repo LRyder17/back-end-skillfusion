@@ -14,8 +14,10 @@ urlpatterns = [
     path('create_course/', views.create_course, name='create_course'),
     path('courses/', views.course_list, name='course_list'),
     path('courses/<int:pk>/', views.course_detail, name='course_detail'),
-    # path('courses/subject/<str:subject>/', views.courses_by_subject, name='courses_by_subject'),
-
+    path('courses/subject/<str:subject>/', views.courses_by_subject, name='courses_by_subject'),
+    path('courses/category/<int:category_id>/', views.courses_by_category, name='courses_by_category'),
+    path('search_courses/', views.search_courses, name='search_courses'),
+    path('my_courses/', views.my_courses, name='my_courses'),
 ]
     # path('courses/<int:course_id>/add_to_calendar/', add_course_to_calendar, name='add_to_calendar'),
 

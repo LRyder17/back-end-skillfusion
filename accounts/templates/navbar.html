@@ -28,8 +28,9 @@
             <a class="nav-link" 
             href="{% url 'login' %}">Login</a>
           </li>
-          <a class="nav-link" 
-            href="{% url 'register' %}">Register</a>
+          <li class="nav-item"> 
+            <a class="nav-link" 
+              href="{% url 'register' %}">Register</a>
           </li>
           {% endif %}
 
@@ -45,10 +46,11 @@
             </ul>
           </li>
         </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="d-flex" method="POST" action="{% url 'search_courses' %}" role="search"> <!-- Fixed action attribute -->
+          {% csrf_token %}
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query"> <!-- Added name attribute -->
           <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
+      </form>
       </div>
     </div>
   </nav>

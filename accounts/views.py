@@ -127,6 +127,26 @@ def course_list(request):
     course_list = Course.objects.all()
     return render(request, 'course_list.html', {'course_list': course_list})
 
+def courses_by_subject(request, subject):
+    course_list = Course.objects.filter(subject=subject)
+    return render(request, 'course_list.html', {'course_list': course_list})
+
+def courses_by_category(request, category_id):
+    course_list = Course.objects.filter(category_id=category_id)
+    return render(request, 'course_list.html', {'course_list': course_list})
+
+def my_courses(request):
+    if request.user.is_authenticated:
+        enrollments = Enrollment.objects.filter(student=request.user)
+        course_list = [enrollment.course for enrollment in enrollments]
+        return render(request, 'course_list.html', {'course_list': course_list})
+    else:
+        messages.success(request,("You must be logged in to view your courses!"))
+        return redirect('login')
+
+
+def search_courses(request):
+    return render(request, 'search_courses.html', {})
 
 def oauth2callback(request):
     auth_code = request.GET.get('code')
