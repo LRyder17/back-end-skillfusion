@@ -123,6 +123,10 @@ def course_detail(request, pk):
     else:
         messages.success(request, "You must be logged in to view this page")
         return redirect('home')
+    
+def course_list(request):
+    course_list = Course.objects.all()
+    return render(request, 'course_list.html', {'course_list': course_list})
 
 
 def oauth2callback(request):

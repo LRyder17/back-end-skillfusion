@@ -15,9 +15,11 @@ Profile List - Skill Fusion
             <div class="row g-0">
                 <div class="col-md-4">
                     {% if profile.profile_image %}
-                    <img src="{{ profile.profile_image.url }}" width=200
-                    height=200 class="img-fluid rounded-start" alt="{{ profile.user.username}}">
-                    {% else %}
+                    <a href="{% url 'profile' profile.id %}">
+                        <img src="{{ profile.profile_image.url }}" width=200
+                        height=200 class="img-fluid rounded-start" alt="{{ profile.user.username}}">
+                    </a>
+                        {% else %}
                     <img src="{% static 'images/generic_profile_pic.png' %}" 
                     class="img-fluid rounded-start" 
                     alt="Profile Picture">
