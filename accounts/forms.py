@@ -69,15 +69,26 @@ class CourseForm(forms.ModelForm):
         model = Course
         fields = ['title', 'subject', 'description', 'category', 'level_of_difficulty',
                   'duration_in_weeks', 'class_frequency', 'max_students', 'open_enrollment']
+        labels = {
+            'title': '',
+            'subject': '',
+            'description': '',
+            'category': '',
+            'level_of_difficulty': '',
+            'duration_in_weeks': '',
+            'class_frequency': '',
+            'max_students': '',
+            'open_enrollment': 'open enrollment',
+        }
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Enter title of course'}),
             'subject': forms.TextInput(attrs={'placeholder': 'Enter course subject'}),
             'description': forms.Textarea(attrs={'placeholder': 'Enter course description'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'level_of_difficulty': forms.Select(choices=Course.LEVEL_CHOICES, attrs={'class': 'form-select'}),
-            'duration_in_weeks': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Enter duration in weeks'}),
-            'class_frequency': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Enter class frequency per week'}),
-            'max_students': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Enter maximum number of students'}),
+            'duration_in_weeks': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Course length(in weeks)'}),
+            'class_frequency': forms.NumberInput(attrs={'min': 0, 'placeholder': '# of meets per week'}),
+            'max_students': forms.NumberInput(attrs={'min': 0, 'placeholder': 'max # of students'}),
             'open_enrollment': forms.CheckboxInput(),
         }
 

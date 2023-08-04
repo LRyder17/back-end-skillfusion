@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User, AbstractUser
 from django.dispatch import receiver
+from django.utils import timezone
+
 
 
 class Profile(models.Model):
@@ -59,6 +61,8 @@ class Course(models.Model):
     course_image = models.ImageField(null=True, blank=True, upload_to="images/")
     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, null=True, blank=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # Allowing null values
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=200, null=True, blank=True)
     subject = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -68,7 +72,7 @@ class Course(models.Model):
     max_students = models.PositiveIntegerField(null=True, blank=True, help_text="Enter maximum number of students. Leave blank for open enrollment.")
     open_enrollment = models.BooleanField(default=True)
     teacher = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="teaching_courses",
+        User, on_delete=models.SET_NULL, related_name="teaching_courses",
         null=True, blank=True
     )
     students = models.ManyToManyField(

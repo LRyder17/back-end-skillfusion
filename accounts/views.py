@@ -104,7 +104,7 @@ def create_course(request):
 
 def course_detail(request, pk):
     course = get_object_or_404(Course, pk=pk)
-
+    can_enroll = False
     if request.user.is_authenticated:
         # Enrollment logic
         if request.method == "POST":
@@ -121,8 +121,7 @@ def course_detail(request, pk):
 
         return render(request, "course_detail.html", {"course": course})
     else:
-        messages.success(request, "You must be logged in to view this page")
-        return redirect('home')
+        return render(request, "course_detail.html", {"course": course})
     
 def course_list(request):
     course_list = Course.objects.all()
