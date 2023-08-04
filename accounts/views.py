@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
@@ -7,7 +7,7 @@ from oauth2client.client import OAuth2Credentials
 # from googleapiclient.discovery import build
 # from google.oauth2 import service_account
 from django.views.decorators.csrf import csrf_exempt
-from .models import Profile, Comment, Course  
+from .models import Profile, Comment, Course, Enrollment   
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
@@ -81,7 +81,47 @@ def profile(request, pk):
     else:
         messages.success(request,("You must be logged in to view this page"))
         return redirect('home')
- 
+    
+def create_course(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            course_form = CourseForm(request.POST) # Get the data from the POST request
+            if course_form.is_valid():
+                course = course_form.save() # Save the form data to the database
+                course.creator = request.user
+                messages.success(request, ("Course created successfully!"))
+                Enrollment.objects.create(course=course, student=request.user)
+                return redirect('home') # Redirect to home or another success page
+        else:
+            course_form = CourseForm() 
+
+        return render(request, 'create_course.html', {'course_form': course_form} )
+    else:
+        messages.success(request, ("You must be logged in to add a course!"))
+        return redirect('home')
+
+def course_detail(request, pk):
+    course = get_object_or_404(Course, pk=pk)
+
+    if request.user.is_authenticated:
+        # Enrollment logic
+        if request.method == "POST":
+            action = request.POST.get('enrollment')
+            if action == "unenroll":
+                # Unenroll the user from the course
+                Enrollment.objects.filter(course=course, student=request.user).delete()
+                course.students.remove(request.user)
+            elif action == "enroll":
+                # Enroll the user in the course
+                Enrollment.objects.create(course=course, student=request.user, enrolled_time=timezone.now())
+                course.students.add(request.user)
+            course.save()
+
+        return render(request, "course_detail.html", {"course": course})
+    else:
+        messages.success(request, "You must be logged in to view this page")
+        return redirect('home')
+
 
 def oauth2callback(request):
     auth_code = request.GET.get('code')
@@ -149,10 +189,3 @@ def update_user(request):
         messages.success(request, ("You must be logged in to update your profile!"))
         return redirect('home')
     
-def create_course(request):
-    if request.user.is_authenticated:
-        course_form = CourseForm() 
-        return render(request, 'create_course.html', {'course_form': course_form} )
-    else:
-        messages.success(request, ("You must be logged in to add a course!"))
-        return redirect('home')

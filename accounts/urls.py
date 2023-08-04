@@ -13,7 +13,7 @@ urlpatterns = [
     path('update_user/', views.update_user, name='update_user'),
     path('create_course/', views.create_course, name='create_course'),
     # path('courses/', views.course_list, name='course_list'),
-    # path('courses/<int:pk>/', views.course_detail, name='course_detail'),
+    path('courses/<int:pk>/', views.course_detail, name='course_detail'),
     # path('courses/subject/<str:subject>/', views.courses_by_subject, name='courses_by_subject'),
 
 ]

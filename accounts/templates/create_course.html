@@ -5,19 +5,43 @@
 <div class="col-md-6 offset-md-3">
 <h1>Create Course</h1>
 <br/>
-<form class="row g-3" method="POST">
+<form class="row g-3" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="col-md-6">
-      <label for="id_title" class="form-label">Title</label>
-      <input type="text" class="form-control" id="id_title" name="title" placeholder="Enter title of course">
+        {{ course_form.title.label_tag }}
+        {{ course_form.title }}
     </div>
     <div class="col-md-6">
-      <label for="id_subject" class="form-label">Subject</label>
-      <input type="text" class="form-control" id="id_subject" name="subject" placeholder="Enter course subject">
+        {{ course_form.subject.label_tag }}
+        {{ course_form.subject }}
     </div>
     <div class="col-12">
-      <label for="id_description" class="form-label">Description</label>
-      <textarea class="form-control" id="id_description" name="description" placeholder="Enter course description"></textarea>
+        {{ course_form.description.label_tag }}
+        {{ course_form.description }}
+    </div>
+    <div class="col-md-6">
+        {{ course_form.category.label_tag }}
+        {{ course_form.category }}
+    </div>
+    <div class="col-md-6">
+        {{ course_form.level_of_difficulty.label_tag }}
+        {{ course_form.level_of_difficulty }}
+    </div>
+    <div class="col-md-6">
+        {{ course_form.duration_in_weeks.label_tag }}
+        {{ course_form.duration_in_weeks }}
+    </div>
+    <div class="col-md-6">
+        {{ course_form.class_frequency.label_tag }}
+        {{ course_form.class_frequency }}
+    </div>
+    <div class="col-md-6">
+        {{ course_form.max_students.label_tag }}
+        {{ course_form.max_students }}
+    </div>
+    <div class="col-md-6">
+        {{ course_form.open_enrollment.label_tag }}
+        {{ course_form.open_enrollment }}
     </div>
     <div class="col-12">
       <button type="submit" class="btn btn-primary">Create Course</button>

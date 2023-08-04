@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="col-md-6 offset-md-3">
+<h1>{{ course.title }}</h1>
+<form method="POST">
+    {% csrf_token %}
+    {% if user.is_authenticated %}
+        {% if course in user.enrolled_courses.all %}
+            <button 
+                class="btn btn-outline-danger" 
+                name="enrollment"
+                value="unenroll" 
+                type="submit">Unenroll from {{ course.title }} 
+            </button>
+        {% else %}
+            <button 
+                class="btn btn-outline-success" 
+                name="enrollment"
+                value="enroll" 
+                type="submit">Enroll in {{ course.title }} 
+            </button>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-primary">Login to Enroll</a>
+    {% endif %}
+</form>
+
+  
+</div>
+{% endblock %}

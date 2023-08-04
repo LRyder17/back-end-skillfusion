@@ -1,9 +1,9 @@
 from django.db import models
 from django.db.models.signals import post_save
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
+from django.dispatch import receiver
 
 
-# Create User profile model
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_teacher = models.BooleanField(default=False)
@@ -18,11 +18,12 @@ class Profile(models.Model):
 
     @property
     def enrolled_courses(self):
-        return self.user.enrolled_courses.all()
+        return ", ".join([enrollment.course.title for enrollment in self.user.enrolled_courses.all()])
 
     @property
     def teaching_courses(self):
-        return self.user.teaching_courses.all()
+        return ", ".join([course.title for course in self.user.teaching_courses.all()])
+
     
     def __str__(self):
         return self.user.username
@@ -38,13 +39,59 @@ def create_profile(sender, instance, created, **kwargs):
 
 post_save.connect(create_profile, sender=User)
 
-class Course(models.Model):
-    enroll = models.ManyToManyField("self",
-                                    related_name="students_enrolled")
-    title = models.CharField(max_length=200)
-    subject = models.CharField(max_length=200)
-    description = models.TextField()
+class CourseCategory(models.Model):
+    title=models.CharField(max_length=100, null=True, blank=True)
+    description=models.TextField(null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural= "Course Categories"
+
+    def __str__(self):
+        return self.title
+
+class Course(models.Model):
+    LEVEL_CHOICES = [
+        ('B', 'Beginner'),
+        ('I', 'Intermediate'),
+        ('A', 'Advanced'),
+    ]
+
+    course_image = models.ImageField(null=True, blank=True, upload_to="images/")
+    category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, null=True, blank=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # Allowing null values
+    title = models.CharField(max_length=200, null=True, blank=True)
+    subject = models.CharField(max_length=200, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    level_of_difficulty = models.CharField(null=True, blank=True, max_length=1, choices=LEVEL_CHOICES)
+    duration_in_weeks = models.PositiveIntegerField(null=True, blank=True, help_text="Enter length of the course in weeks.")
+    class_frequency = models.PositiveIntegerField(null=True, blank=True, help_text="Enter how often the class will meet per week.")
+    max_students = models.PositiveIntegerField(null=True, blank=True, help_text="Enter maximum number of students. Leave blank for open enrollment.")
+    open_enrollment = models.BooleanField(default=True)
+    teacher = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="teaching_courses",
+        null=True, blank=True
+    )
+    students = models.ManyToManyField(
+        User, related_name="enrolled_courses",
+        blank=True
+    )
+
+    class Meta:
+        verbose_name_plural="Courses"
+
+    def __str__(self):
+        return self.title
+
+class Enrollment(models.Model):
+    course=models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrolled_courses')
+    student=models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrolled_students')
+    enrolled_time=models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural="Enrolled Courses"
+    
+    def __str__(self):
+        return f"{self.student} enrolled in {self.course}"
 
 class Comment(models.Model):
     user = models.ForeignKey(
