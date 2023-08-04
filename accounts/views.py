@@ -14,6 +14,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 
 
 def home(request):
