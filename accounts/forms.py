@@ -53,23 +53,18 @@ class ProfilePicForm(forms.ModelForm):
         model = Profile
         fields = ('profile_image', )
 
-class CourseImageForm(forms.ModelForm):
-    course_image = forms.ImageField(label="Course Image")
-
-    class Meta:
-        model = Course
-        fields = ('course_image', )
-
 class CourseForm(forms.ModelForm):
+    course_image = forms.ImageField(label="Course Image", required=False)
     category = forms.ModelChoiceField(queryset=CourseCategory.objects.all(), 
                                       required=False, 
                                       widget=forms.Select(attrs={'class': 'form-select'}))
     
     class Meta:
         model = Course
-        fields = ['title', 'subject', 'description', 'category', 'level_of_difficulty',
+        fields = ['course_image', 'title', 'subject', 'description', 'category', 'level_of_difficulty',
                   'duration_in_weeks', 'class_frequency', 'max_students', 'open_enrollment']
         labels = {
+            'course_image': 'Upload Course Image',
             'title': '',
             'subject': '',
             'description': '',
@@ -81,6 +76,7 @@ class CourseForm(forms.ModelForm):
             'open_enrollment': 'open enrollment',
         }
         widgets = {
+            'course_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'placeholder': 'Enter title of course'}),
             'subject': forms.TextInput(attrs={'placeholder': 'Enter course subject'}),
             'description': forms.Textarea(attrs={'placeholder': 'Enter course description'}),

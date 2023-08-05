@@ -19,6 +19,8 @@ urlpatterns = [
     path('courses/category/<int:category_id>/', views.courses_by_category, name='courses_by_category'),
     path('search_courses/', views.search_courses, name='search_courses'),
     path('my_courses/', views.my_courses, name='my_courses'),
+    path('calendar/', views.calendar_view, name='calendar_view'),
+    path('<int:year>/<str:month>/', views.calendar_view, name='calendar_view')
 ]
     # path('courses/<int:course_id>/add_to_calendar/', add_course_to_calendar, name='add_to_calendar'),
 

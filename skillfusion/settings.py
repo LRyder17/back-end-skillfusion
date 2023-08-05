@@ -43,11 +43,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, 'static'),
 # ]
-STATIC_URL = 'static/'
-
-MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 
 
 # Quick-start development settings - unsuitable for production
@@ -75,6 +70,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'storages',
     'rest_framework'
 ]
 
@@ -167,3 +163,34 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.AllowAllUsersModelBackend']
+
+# AWS S3 Settings
+
+AWS_ACCESS_KEY_ID = 'AKIAXMXFZ64ER2B5XEC6'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'skillfusion-bucket'
+AWS_S3_REGION_NAME = 'us-east-2'
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_VERITY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_S3_CUSTOM_DOMAIN = 'skillfusion-bucket.s3.amazonaws.com'
+AWS_DEFAULT_ACL = 'public-read'
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400'
+} 
+AWS_LOCATION = 'static'
+
+AWS_QUERYSTRING_AUTH = False
+
+AWS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+}
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# STATIC_URL = 'static/'
+# MEDIA_URL = 'media/'
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

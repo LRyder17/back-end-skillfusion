@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_teacher = models.BooleanField(default=False)
@@ -84,7 +83,8 @@ class Course(models.Model):
         verbose_name_plural="Courses"
 
     def __str__(self):
-        return self.title
+        return self.title if self.title else 'No Title'
+
 
 class Enrollment(models.Model):
     course=models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrolled_courses')

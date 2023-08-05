@@ -15,7 +15,33 @@ from django import forms
 from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm
 from django.contrib.auth.models import User
 from django.utils import timezone
+import calendar
+from calendar import HTMLCalendar
+from datetime import datetime
+from django.core.files.base import ContentFile
+import boto3
+from io import BytesIO
 
+# def upload_to_s3(file):
+#     s3 = boto3.client('s3')
+#     if file.multiple_chunks():
+#         content = b''.join(chunk for chunk in file.chunks())
+#     else:
+#         content = file.read()
+#     file_to_upload = ContentFile(content)
+#     s3.upload_fileobj(file_to_upload, 'skillfusion', 'images/')
+
+
+# if errors occur try changing 'skillfusion' to 'skillfusion-bucket'
+def upload_to_s3(file):
+    s3 = boto3.client('s3')
+    if file.multiple_chunks():
+        content = b''.join(chunk for chunk in file.chunks())
+    else:
+        content = file.read()
+
+    file_to_upload = BytesIO(content)
+    s3.upload_fileobj(file_to_upload, 'skillfusion', 'images/' + file.name)
 
 
 def home(request):
@@ -93,24 +119,27 @@ def profile(request, pk):
     else:
         messages.success(request,("You must be logged in to view this page"))
         return redirect('home')
-    
+
 def create_course(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            course_form = CourseForm(request.POST) # Get the data from the POST request
+            course_form = CourseForm(request.POST, request.FILES)
             if course_form.is_valid():
-                course = course_form.save() # Save the form data to the database
+                course = course_form.save(commit=False) 
                 course.creator = request.user
+                course.save()
+
                 messages.success(request, ("Course created successfully!"))
                 Enrollment.objects.create(course=course, student=request.user)
-                return redirect('home') # Redirect to home or another success page
+                return redirect('courses')
         else:
             course_form = CourseForm() 
 
-        return render(request, 'create_course.html', {'course_form': course_form} )
+        return render(request, 'create_course.html', {'course_form': course_form})
     else:
         messages.success(request, ("You must be logged in to add a course!"))
-        return redirect('home')
+        return redirect('login')
+
 
 def course_detail(request, pk):
     course = get_object_or_404(Course, pk=pk)
@@ -194,7 +223,7 @@ def register_user(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
             # first_name = form.cleaned_data['first_name']
-            # last_name = form.cleaned_data['second_name']
+            # last_name = form.cleaned_data['last_name']
             # email = form.cleaned_data['email']
             # Log in User
             user = authenticate(username=username, password=password)
@@ -223,4 +252,21 @@ def update_user(request):
     else:
         messages.success(request, ("You must be logged in to update your profile!"))
         return redirect('home')
+
+def calendar_view(request, year=datetime.now().year, month=datetime.now().strftime('%B')):
+    month = month.capitalize()
+    month_number = list(calendar.month_name).index(month)
+    month_number = int(month_number)
+
+    cal = HTMLCalendar().formatmonth(
+        year,
+        month_number
+    )
+    now = datetime.now()
+    current_year = now.year
+    return render(request, 'calendar_view.html', 
+                  {'year': now.year,
+                   'month': month,
+                   'cal': cal,
+                  })
     
