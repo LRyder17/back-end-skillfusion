@@ -53,6 +53,16 @@ def follower_list(request, user_id):
         messages.success(request, ("You must be logged in to view this page"))
         return redirect('home')
 
+def comment_like(request, pk):
+    if request.user.is_authenticated:
+        comment = get_object_or_404(Comment, id=pk)
+        if comment.likes.filter(id=request.user.id):
+            comment.likes.remove(request.user)
+        else:
+            comment.likes.add(request.user)
+    
+        return redirect('home')
+
 def profile_list(request):
     if request.user.is_authenticated:
         profiles = Profile.objects.exclude(user=request.user)

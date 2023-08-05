@@ -26,7 +26,11 @@
             {{ comment.body }}<br/>
             <small class="text muted">
                 ({{comment.created_at}})
+                <a href="{% url 'comment_like' comment.id %}">💜</a>
                 By <strong>@{{comment.user.username}}</strong>
+                    {% if comment.number_of_likes > 0 %}
+                        - {{comment.number_of_likes}} Likes
+                    {% endif %}
             </small>
         </div>
         <br/>

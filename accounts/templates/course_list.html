@@ -25,13 +25,25 @@
       <div class="col-md-8">
         <div class="card-body">
           <h5 class="card-title"> <strong>{{course.title}}</strong></h5>
-          <p class="card-text"><strong>Course Decription</strong>: {{ course.description }}</p>
-            {% if course.teacher %}
-            <p class="card-text"><small class="text-body-secondary">Teacher led course.</small></p>
-            {% else %}
-            <p class="card-text"><small class="text-body-secondary">Student Led Course</small></p>
-            {% endif %}
-        </div>
+          <p class="card-text"><strong>Course Subject</strong>: {{ course.subject }}</p>
+          <p class="card-text">
+            <small class="text-body-primary">
+              {% if course.open_enrollment %}
+                Open Enrollment
+              {% else %}
+                Enrollment Closed
+              {% endif %}
+            </small>
+            |
+            <small class="text-body-secondary">
+              {% if course.teacher %}
+                Teacher led course.
+              {% else %}
+                Student Led Course
+              {% endif %}
+            </small>
+          </p>
+        </div>        
       </div>
     </div>
   </div>

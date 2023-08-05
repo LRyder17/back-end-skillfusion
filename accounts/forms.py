@@ -16,7 +16,7 @@ class CommentForm(forms.ModelForm):
                            )
     class Meta:
         model = Comment
-        exclude = ("user",)
+        exclude = ("user", "likes")
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(label ="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': "Email Address"}))

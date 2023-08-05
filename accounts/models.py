@@ -115,3 +115,4 @@ class Comment(models.Model):
             f"({self.created_at: %Y-%m-%d %H:%M}): "
             f"{self.body}..."
         )
+
