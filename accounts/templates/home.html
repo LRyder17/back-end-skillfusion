@@ -15,8 +15,10 @@
                 <div class="row">
                     <div class="col-1"> 
                         {% if comment.user.profile.profile_image %}
-                        <img src="{{ comment.user.profile.profile_image.url }}" width=50 
-                        height=50 class="rounded-circle" alt="{{ profile.profile.username }}">
+                        <a href="{% url 'profile' comment.user.profile.id %}">
+                            <img src="{{ comment.user.profile.profile_image.url }}" width=50 
+                            height=50 class="rounded-circle" alt="{{ profile.profile.username }}">
+                        </a>
                         {% else %}
                         <img src="{% static 'images/generic_profile_pic.png' %}" width=50 
                         height=50 class="rounded-circle" alt="{{ profile.profile.username }}">
@@ -26,7 +28,7 @@
             {{ comment.body }}<br/>
             <small class="text muted">
                 ({{comment.created_at}})
-                <a href="{% url 'comment_like' comment.id %}">💜</a>
+                <a href="{% url 'comment_like' comment.id %}" style="text-decoration: none;">💜</a>
                 By <strong>@{{comment.user.username}}</strong>
                     {% if comment.number_of_likes > 0 %}
                         - {{comment.number_of_likes}} Likes

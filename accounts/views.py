@@ -43,7 +43,6 @@ def upload_to_s3(file):
     file_to_upload = BytesIO(content)
     s3.upload_fileobj(file_to_upload, 'skillfusion', 'images/' + file.name)
 
-
 def home(request):
     if request.user.is_authenticated:
         form = CommentForm(request.POST or None)
