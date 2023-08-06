@@ -186,6 +186,9 @@ def my_courses(request):
 def update_course(request, course_id):
     course = Course.objects.get(pk=course_id)
     form = CourseForm(request.POST or None, instance=course)
+    if form.is_valid():
+        form.save()
+        return redirect('course_list')
     return render(request, 'update_course.html', {'course': course, 'form': form})
 
 def search_courses(request):
