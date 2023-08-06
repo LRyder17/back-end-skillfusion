@@ -131,7 +131,7 @@ def create_course(request):
 
                 messages.success(request, ("Course created successfully!"))
                 Enrollment.objects.create(course=course, student=request.user)
-                return redirect('courses')
+                return redirect('course_list')
         else:
             course_form = CourseForm() 
 
