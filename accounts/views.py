@@ -185,7 +185,7 @@ def my_courses(request):
 
 def update_course(request, course_id):
     course = Course.objects.get(pk=course_id)
-    form = CourseForm(request.POST, request.FILES or None, instance=course)
+    form = CourseForm(request.POST or None, instance=course)
     return render(request, 'update_course.html', {'course': course, 'form': form})
 
 def search_courses(request):
