@@ -69,7 +69,7 @@ class CourseForm(forms.ModelForm):
             'subject': '',
             'description': '',
             'category': '',
-            'level_of_difficulty': '',
+            'level_of_difficulty': 'Level of Difficulty',
             'duration_in_weeks': '',
             'class_frequency': '',
             'max_students': '',
