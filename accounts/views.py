@@ -200,6 +200,17 @@ def search_courses(request):
     else:
         return render(request, 'search_courses.html', {})
 
+def delete_course(request, pk):
+    course = Course.objects.get(pk=pk)
+    
+    if request.method == "POST":
+        course.delete()
+        messages.success(request, "Your course has been successfully deleted!")
+        return redirect('course_list')
+    
+    return render(request, 'confirm_delete_course.html', {'course': course})
+
+
 def oauth2callback(request):
     auth_code = request.GET.get('code')
     credentials = flow.step2_exchange(auth_code)

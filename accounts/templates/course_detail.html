@@ -28,7 +28,13 @@
 <br/><br/>
 </form>
 <td align="right">
-    <a href="{% url 'update_course' course.id %}" class="btn btn-outline-secondary"> Update Course </a>
+    <div>
+        <a href="{% url 'update_course' course.id %}" class="btn btn-outline-secondary"> Update Course </a>
+    </div>
+    <br/>
+    <div>
+        <a href="{% url 'delete_course' course.id %}" class="btn btn-outline-danger">Delete Course</a>
+    </div>
 </td>
   
 </div>
