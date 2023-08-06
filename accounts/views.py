@@ -183,9 +183,19 @@ def my_courses(request):
         messages.success(request,("You must be logged in to view your courses!"))
         return redirect('login')
 
+def update_course(request, course_id):
+    course = Course.objects.get(pk=course_id)
+    form = CourseForm(request.POST, request.FILES or None, instance=course)
+    return render(request, 'update_course.html', {'course': course, 'form': form})
 
 def search_courses(request):
-    return render(request, 'search_courses.html', {})
+    if request.method == "POST":
+        searched = request.POST['searched']
+        courses = Course.objects.filter(title__contains=searched)
+        return render(request, 'search_courses.html', {'searched': searched,
+                                                       'courses': courses})
+    else:
+        return render(request, 'search_courses.html', {})
 
 def oauth2callback(request):
     auth_code = request.GET.get('code')

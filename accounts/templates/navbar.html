@@ -46,9 +46,10 @@
             </ul>
           </li>
         </ul>
-        <form class="d-flex" method="POST" action="{% url 'search_courses' %}" role="search"> <!-- Fixed action attribute -->
+        <form class="d-flex" method="POST" action="{% url 'search_courses' %}" role="search"> 
           {% csrf_token %}
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query"> <!-- Added name attribute -->
+          <input class="form-control me-2" type="search" placeholder="Search" 
+          aria-label="Search" name="searched">
           <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
       </div>
