@@ -178,7 +178,7 @@ def my_courses(request):
     if request.user.is_authenticated:
         enrollments = Enrollment.objects.filter(student=request.user)
         course_list = [enrollment.course for enrollment in enrollments]
-        return render(request, 'course_list.html', {'course_list': course_list})
+        return render(request, 'my_courses.html', {'course_list': course_list})
     else:
         messages.success(request,("You must be logged in to view your courses!"))
         return redirect('login')
