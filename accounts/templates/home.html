@@ -23,16 +23,24 @@
                         <img src="{% static 'images/generic_profile_pic.png' %}" width=50 
                         height=50 class="rounded-circle" alt="{{ profile.profile.username }}">
                         {% endif %}
-                    </div>
-            <div class="col-10">       
+            </div>
+            <div class="col-md-10">       
             {{ comment.body }}<br/>
             <small class="text muted">
-                ({{comment.created_at}})
-                <a href="{% url 'comment_like' comment.id %}" style="text-decoration: none;">💜</a>
                 By <strong>@{{comment.user.username}}</strong>
-                    {% if comment.number_of_likes > 0 %}
-                        - {{comment.number_of_likes}} Likes
-                    {% endif %}
+                {% if comment.number_of_likes == 1 %}
+                    - 1 Like
+                {% elif comment.number_of_likes > 1 %}
+                    - {{comment.number_of_likes}} Likes
+                {% endif %}
+                ({{comment.created_at}})
+                {% if user in comment.likes.all %}
+                    <a href="{% url 'comment_like' comment.id %}">
+                        <i class="fa-solid fa-heart" style="color:green"></i></a>
+                {% else %}
+                    <a href="{% url 'comment_like' comment.id %}">
+                        <i class="fa fa-heart-o" style="color:green"></i></a>
+                {% endif %}
             </small>
         </div>
         <br/>

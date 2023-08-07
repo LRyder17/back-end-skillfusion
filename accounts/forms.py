@@ -3,6 +3,7 @@ from django.forms import inlineformset_factory
 from .models import Comment, Profile, Course, CourseCategory, ClassMeeting
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.validators import MaxLengthValidator
 
 class CommentForm(forms.ModelForm):
     body = forms.CharField(required=True,
@@ -48,10 +49,11 @@ class UserRegistrationForm(UserCreationForm):
 
 class ProfilePicForm(forms.ModelForm):
     profile_image = forms.ImageField(label="Profile Picture")
+    about_me = forms.CharField(widget=forms.Textarea, validators=[MaxLengthValidator(500)])
 
     class Meta:
         model = Profile
-        fields = ('profile_image', )
+        fields = ('profile_image', 'about_me')
 
 class CourseForm(forms.ModelForm):
     course_image = forms.ImageField(label="Course Image", required=False)

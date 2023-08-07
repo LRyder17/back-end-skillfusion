@@ -7,6 +7,7 @@ from django.utils import timezone
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    about_me = models.TextField(null=True, blank=True)
     is_teacher = models.BooleanField(default=False)
     follows = models.ManyToManyField("self",
                                     related_name="followed_by",
