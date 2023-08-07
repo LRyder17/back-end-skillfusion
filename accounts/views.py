@@ -52,7 +52,7 @@ def home(request):
                 comment.user = request.user
                 comment.save()
                 messages.success(request,("Your comment has been posted successfully!"))
-                return redirect('home')
+                return redirect(request.META.get("HTTP_REFERER"))
             
         comments = Comment.objects.all().order_by("-created_at")
         return render(request, 'home.html', {"comments": comments, "form": form})
@@ -67,7 +67,7 @@ def following_list(request, user_id):
         return render(request, 'profile_list.html', {'profiles': profiles})
     else:
         messages.success(request, ("You must be logged in to view this page"))
-        return redirect('home')
+        return redirect(request.META.get("HTTP_REFERER"))
 
 def follower_list(request, user_id):
     if request.user.is_authenticated:
@@ -76,7 +76,7 @@ def follower_list(request, user_id):
         return render(request, 'profile_list.html', {'profiles': profiles})
     else:
         messages.success(request, ("You must be logged in to view this page"))
-        return redirect('home')
+        return redirect(request.META.get("HTTP_REFERER"))
 
 def comment_like(request, pk):
     if request.user.is_authenticated:
@@ -86,7 +86,24 @@ def comment_like(request, pk):
         else:
             comment.likes.add(request.user)
     
+        return redirect(request.META.get("HTTP_REFERER"))
+
+def comment_show(request, pk):
+    comment = get_object_or_404(Comment, id=pk)
+    if comment:
+        return render(request, 'show_comment.html', {'comment': comment})
+    else:
+        messages.success(request, ("That Comment Does Not Exist!"))
         return redirect('home')
+    
+def delete_comment(request, pk):
+    if request.user.is_authenticated:
+        comment = get_object_or_404(Comment, id=pk)
+        if comment:
+            return render(request, 'show_comment.html', {'comment': comment})
+        else:
+            messages.success(request, ("That Comment Does Not Exist!"))
+            return redirect(request.META.get("HTTP_REFERER"))
 
 def profile_list(request):
     if request.user.is_authenticated:
@@ -94,7 +111,7 @@ def profile_list(request):
         return render(request, 'profile_list.html', {"profiles": profiles})
     else:
         messages.success(request, ("You must be logged in to view this page"))
-        return redirect('home')
+        return redirect(request.META.get("HTTP_REFERER"))
     
 def profile(request, pk):
     if request.user.is_authenticated:
@@ -117,7 +134,7 @@ def profile(request, pk):
         return render(request, "profile.html", {"profile": profile, "comments": comments})
     else:
         messages.success(request,("You must be logged in to view this page"))
-        return redirect('home')
+        return redirect(request.META.get("HTTP_REFERER"))
 
 def create_course(request):
     if request.user.is_authenticated:
