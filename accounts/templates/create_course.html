@@ -4,19 +4,28 @@
 
 <div class="col-md-6 offset-md-3">
 <h1>Create Course</h1>
+Fields with asterisks are required
+<br/>
 <br/>
 <form class="row g-3" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+    <div class="col-12">
+        {{ course_form.course_image.label_tag }}
+        {{ course_form.course_image }}
+    </div>
     <div class="col-md-6">
-        {{ course_form.title.label_tag }}
         {{ course_form.title }}
     </div>
     <div class="col-md-6">
-        {{ course_form.subject.label_tag }}
         {{ course_form.subject }}
     </div>
+    <div class="col-md-6">
+        {{ course_form.duration_in_weeks }}
+    </div>
+    <div class="col-md-6">
+        {{ course_form.max_students }}
+    </div>
     <div class="col-12">
-        {{ course_form.description.label_tag }}
         {{ course_form.description }}
     </div>
     <div class="col-md-6">
@@ -28,24 +37,32 @@
         {{ course_form.level_of_difficulty }}
     </div>
     <div class="col-md-6">
-        {{ course_form.duration_in_weeks.label_tag }}
-        {{ course_form.duration_in_weeks }}
+        {{ classmeeting_form.start_time }}
     </div>
     <div class="col-md-6">
-        {{ course_form.class_frequency.label_tag }}
         {{ course_form.class_frequency }}
     </div>
-    <div class="col-md-6">
-        {{ course_form.max_students.label_tag }}
-        {{ course_form.max_students }}
+    <div class="col-12">
+        {{ classmeeting_form.start_time_meridiem }} 
     </div>
     <div class="col-md-6">
-        {{ course_form.open_enrollment.label_tag }}
-        {{ course_form.open_enrollment }}
+        {{ classmeeting_form.end_time }}
     </div>
     <div class="col-md-6">
-        {{ course_form.course_image.label_tag }}
-        {{ course_form.course_image }}
+        {{ classmeeting_form.location }}
+    </div>
+    <div class="col-12">
+        {{ classmeeting_form.end_time_meridiem }} 
+    </div>
+    <div class="col-12">
+        {{ classmeeting_form.meeting_type.label_tag }}
+        {{ classmeeting_form.meeting_type }}
+    </div>
+    <div class="col-12">
+        {{ classmeeting_form.meeting_link }}
+    </div>
+    <div class="col-12">
+        {{ classmeeting_form.description }}
     </div>
     <div class="col-12">
       <button type="submit" class="btn btn-primary">Create Course</button>

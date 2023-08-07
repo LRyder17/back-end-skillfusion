@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm
+from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm, ClassMeetingForm
 from django.contrib.auth.models import User
 from django.utils import timezone
 import calendar
@@ -123,9 +123,15 @@ def create_course(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             course_form = CourseForm(request.POST, request.FILES)
-            if course_form.is_valid():
+            classmeeting_form = ClassMeetingForm(request.POST, prefix='class_meetings')
+            if course_form.is_valid() and classmeeting_form.is_vaid():
                 course = course_form.save(commit=False) 
                 course.creator = request.user
+                classmeeting_form.instance = course
+                if request.teacher != None:
+                    course.teacher = request.teacher
+
+                classmeeting_form.save()
                 course.save()
 
                 messages.success(request, ("Course created successfully!"))
@@ -133,8 +139,9 @@ def create_course(request):
                 return redirect('course_list')
         else:
             course_form = CourseForm() 
+            classmeeting_form = ClassMeetingForm(prefix='class_meetings')
 
-        return render(request, 'create_course.html', {'course_form': course_form})
+        return render(request, 'create_course.html', {'course_form': course_form, 'classmeeting_form': classmeeting_form})
     else:
         messages.success(request, ("You must be logged in to add a course!"))
         return redirect('login')

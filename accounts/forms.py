@@ -1,6 +1,6 @@
 from django import forms 
 from django.forms import inlineformset_factory
-from .models import Comment, Profile, Course, CourseCategory
+from .models import Comment, Profile, Course, CourseCategory, ClassMeeting
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -64,7 +64,6 @@ class CourseForm(forms.ModelForm):
         fields = ['course_image', 'title', 'subject', 'description', 'category', 'level_of_difficulty',
                   'duration_in_weeks', 'class_frequency', 'max_students', 'open_enrollment']
         labels = {
-            'course_image': 'Upload Course Image',
             'title': '',
             'subject': '',
             'description': '',
@@ -77,9 +76,9 @@ class CourseForm(forms.ModelForm):
         }
         widgets = {
             'course_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'title': forms.TextInput(attrs={'placeholder': 'Enter title of course'}),
-            'subject': forms.TextInput(attrs={'placeholder': 'Enter course subject'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Enter course description'}),
+            'title': forms.TextInput(attrs={'placeholder': '*Enter title of course', 'required': True}),
+            'subject': forms.TextInput(attrs={'placeholder': '*Enter course subject', 'required': True}),
+            'description': forms.Textarea(attrs={'placeholder': '*Enter course description', 'required': True}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'level_of_difficulty': forms.Select(choices=Course.LEVEL_CHOICES, attrs={'class': 'form-select'}),
             'duration_in_weeks': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Course length(in weeks)'}),
@@ -89,28 +88,32 @@ class CourseForm(forms.ModelForm):
         }
 
 
-# class ClassMeetingForm(forms.ModelForm):
-#     class Meta:
-#         model = ClassMeetings
-#         fields = ['meeting_type', 'date', 'start_time', 'end_time', 'location', 'meeting_link', 'description']
-#         widgets = {
-#             'meeting_type': forms.Select(attrs={'placeholder': 'Select meeting type'}),
-#             'date': forms.DateInput(attrs={'placeholder': 'Select date'}),
-#             'start_time': forms.TimeInput(attrs={'placeholder': 'Select start time'}),
-#             'end_time': forms.TimeInput(attrs={'placeholder': 'Select end time'}),
-#             'location': forms.TextInput(attrs={'placeholder': 'Enter location'}),
-#             'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
-#             'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
-#         }
-#         required = {
-#             'meeting_type': False,
-#             'date': False,
-#             'start_time': False,
-#             'end_time': False,
-#             'location': False,
-#             'meeting_link': False,
-#             'description': False,
-#         }
+class ClassMeetingForm(forms.ModelForm):
+    
+    class Meta:
+        model = ClassMeeting
+        fields = ['meeting_type', 'date', 'start_time', 'end_time', 'location', 
+                  'start_time_meridiem', 'end_time_meridiem', 'meeting_link', 'description']
+        widgets = {
+            'meeting_type': forms.Select(),
+            'date': forms.DateInput(attrs={'placeholder': 'Enter course start date'}),
+            'start_time': forms.TimeInput(attrs={'placeholder': 'start time (--:--)'}),
+            'end_time': forms.TimeInput(attrs={'placeholder': 'end time(--:--)'}),
+            'start_time_meridiem': forms.Select(),
+            'end_time_meridiem': forms.Select(),
+            'location': forms.TextInput(attrs={'placeholder': 'Enter location'}),
+            'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
+        }
+        required = {
+            'meeting_type': False,
+            'date': False,
+            'start_time': False,
+            'end_time': False,
+            'location': False,
+            'meeting_link': False,
+            'description': False,
+        }
 
 
-# ClassMeetingFormSet = inlineformset_factory(Course, ClassMeetings, form=ClassMeetingForm, extra=1)
+ClassMeetingFormSet = inlineformset_factory(Course, ClassMeeting, form=ClassMeetingForm, extra=1)

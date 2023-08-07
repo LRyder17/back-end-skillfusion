@@ -62,9 +62,9 @@ class Course(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # Allowing null values
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    title = models.CharField(max_length=200, null=True, blank=True)
-    subject = models.CharField(max_length=200, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    title = models.CharField(max_length=200)
+    subject = models.CharField(max_length=200)
+    description = models.TextField(default="")
     level_of_difficulty = models.CharField(null=True, blank=True, max_length=1, choices=LEVEL_CHOICES)
     duration_in_weeks = models.PositiveIntegerField(null=True, blank=True, help_text="Enter length of the course in weeks.")
     class_frequency = models.PositiveIntegerField(null=True, blank=True, help_text="Enter how often the class will meet per week.")
@@ -84,6 +84,35 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title if self.title else 'No Title'
+    
+class ClassMeeting(models.Model):
+    MEETING_TYPES = [
+        ('ONLINE', 'Online'),
+        ('IN_PERSON', 'In-person'),
+        ('HYBRID', 'Hybrid'),
+    ]
+    MERIDIEM_CHOICES = [
+    ('--', '--'),
+    ('AM', 'AM'),
+    ('PM', 'PM'),
+    ]
+    course = models.ForeignKey(Course, related_name='class_meeting_schedule', on_delete=models.CASCADE)
+    meeting_type = models.CharField(max_length=10, choices=MEETING_TYPES, default='ONLINE')
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    start_time_meridiem = models.CharField(max_length=2, choices=MERIDIEM_CHOICES, default='--')
+    end_time_meridiem = models.CharField(max_length=2, choices=MERIDIEM_CHOICES,  default='--')
+    location = models.CharField(max_length=255, blank=True, null=True)
+    meeting_link = models.URLField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Class Meeting"
+        verbose_name_plural = "Class Meetings"
+    
+    def __str__(self):
+        return f"{self.course.course_subject} - {self.date} - {self.start_time} to {self.end_time}"
 
 
 class Enrollment(models.Model):

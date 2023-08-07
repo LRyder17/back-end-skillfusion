@@ -9,14 +9,14 @@
       <h1>{{ profile.user.username }}'s Profile</h1>
       <br/>
         {% if comments %}
-            {% for comment in comments %}
-                <div class="alert alert-info" role="alert">
+        {% for comment in comments %}
+        <div class="alert alert-info" role="alert">
             <div class="container">
                 <div class="row">
-                    <div class="col-1">
-                        {% if profile.profile_image %}
-                        <a href="{% url 'profile' profile.id %}">
-                            <img src="{{ profile.profile_image.url }}" width=50 
+                    <div class="col-1"> 
+                        {% if comment.user.profile.profile_image %}
+                        <a href="{% url 'profile' comment.user.profile.id %}">
+                            <img src="{{ comment.user.profile.profile_image.url }}" width=50 
                             height=50 class="rounded-circle" alt="{{ profile.profile.username }}">
                         </a>
                         {% else %}
@@ -24,13 +24,18 @@
                         height=50 class="rounded-circle" alt="{{ profile.profile.username }}">
                         {% endif %}
                     </div>
-                    <div class="col-10">
-                    {{ comment.body }}<br/>
-                <small class="text muted">
-                    ({{comment.created_at}})
-                    By <strong>@{{comment.user.username}}</strong>
-                </small>
-                </div>
+            <div class="col-10">       
+            {{ comment.body }}<br/>
+            <small class="text muted">
+                ({{comment.created_at}})
+                <a href="{% url 'comment_like' comment.id %}" style="text-decoration: none;">💜</a>
+                By <strong>@{{comment.user.username}}</strong>
+                    {% if comment.number_of_likes > 0 %}
+                        - {{comment.number_of_likes}} Likes
+                    {% endif %}
+            </small>
+        </div>
+        <br/>
                 <br/>
             </div>
             </div>
@@ -53,6 +58,7 @@
         </div>
       </div>
     {% endif %}
+    <h2> About Me:</h2>
     <br/>
     <div class="col-4">
     <div class="card">
