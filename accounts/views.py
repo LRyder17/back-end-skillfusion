@@ -99,8 +99,9 @@ def comment_show(request, pk):
 def delete_comment(request, pk):
     if request.user.is_authenticated:
         comment = get_object_or_404(Comment, id=pk)
-        if comment:
-            return render(request, 'show_comment.html', {'comment': comment})
+        if request.user.username == comment.user.username:
+            comment.delete()
+            return redirect(request.META.get("HTTP_REFERER"))
         else:
             messages.success(request, ("That Comment Does Not Exist!"))
             return redirect(request.META.get("HTTP_REFERER"))
