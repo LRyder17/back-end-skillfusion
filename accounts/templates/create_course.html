@@ -19,6 +19,14 @@ Fields with asterisks are required
     <div class="col-md-6">
         {{ course_form.subject }}
     </div>
+    <div class="col-4">
+        {{ course_form.teacher.label_tag }}
+        {{ course_form.teacher }}
+    </div>
+    <div class="col-4">
+    </div>
+    <div class="col-4">
+    </div>
     <div class="col-md-6">
         {{ course_form.duration_in_weeks }}
     </div>
@@ -37,6 +45,10 @@ Fields with asterisks are required
         {{ course_form.level_of_difficulty }}
     </div>
     <div class="col-md-6">
+        {{ course_form.open_enrollment.label_tag }}
+        {{ course_form.open_enrollment }}
+    </div>
+    {% comment %} <div class="col-md-6">
         {{ classmeeting_form.start_time }}
     </div>
     <div class="col-md-6">
@@ -63,7 +75,7 @@ Fields with asterisks are required
     </div>
     <div class="col-12">
         {{ classmeeting_form.description }}
-    </div>
+    </div> {% endcomment %}
     <div class="col-12">
       <button type="submit" class="btn btn-primary">Create Course</button>
     </div>

@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm, ClassMeetingForm
+from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm
 from django.contrib.auth.models import User
 from django.utils import timezone
 import calendar
@@ -102,9 +102,15 @@ def delete_comment(request, pk):
         if request.user.username == comment.user.username:
             comment.delete()
             return redirect(request.META.get("HTTP_REFERER"))
+        elif request.user.username != comment.user.username:
+            messages.success(request, ("That Comment Does Not Belong to You"))
+            return redirect('home')
         else:
-            messages.success(request, ("That Comment Does Not Exist!"))
-            return redirect(request.META.get("HTTP_REFERER"))
+            messages.success(request, ("That Comment Does Not Exist"))
+            return redirect('home')
+    else:
+        messages.success(request, ("Please log in to continue."))
+        return redirect(request.META.get('login'))
 
 def profile_list(request):
     if request.user.is_authenticated:
@@ -141,15 +147,18 @@ def create_course(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             course_form = CourseForm(request.POST, request.FILES)
-            classmeeting_form = ClassMeetingForm(request.POST, prefix='class_meetings')
-            if course_form.is_valid() and classmeeting_form.is_vaid():
+            # classmeeting_form = ClassMeetingForm(request.POST, prefix='class_meetings')
+            if course_form.is_valid(): #  and classmeeting_form.is_valid()
                 course = course_form.save(commit=False) 
                 course.creator = request.user
-                classmeeting_form.instance = course
-                if request.teacher != None:
-                    course.teacher = request.teacher
+                course.teacher = course_form.cleaned_data['teacher']
+                # classmeeting_form.instance = course
+                if course.teacher:
+                    profile = course.teacher.profile # Assuming there is a profile relation in the User model
+                    profile.is_teacher = True
+                    profile.save()
 
-                classmeeting_form.save()
+                # classmeeting_form.save()
                 course.save()
 
                 messages.success(request, ("Course created successfully!"))
@@ -157,9 +166,9 @@ def create_course(request):
                 return redirect('course_list')
         else:
             course_form = CourseForm() 
-            classmeeting_form = ClassMeetingForm(prefix='class_meetings')
+            # classmeeting_form = ClassMeetingForm(prefix='class_meetings')
 
-        return render(request, 'create_course.html', {'course_form': course_form, 'classmeeting_form': classmeeting_form})
+        return render(request, 'create_course.html', {'course_form': course_form}) # 'classmeeting_form': classmeeting_form
     else:
         messages.success(request, ("You must be logged in to add a course!"))
         return redirect('login')
