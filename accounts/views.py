@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm
+from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm, GroupStudyForm, StudyRequestForm
 from django.contrib.auth.models import User
 from django.utils import timezone
 import calendar
@@ -147,31 +147,66 @@ def create_course(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             course_form = CourseForm(request.POST, request.FILES)
-            # classmeeting_form = ClassMeetingForm(request.POST, prefix='class_meetings')
-            if course_form.is_valid(): #  and classmeeting_form.is_valid()
+            if course_form.is_valid():
+                user = request.user
                 course = course_form.save(commit=False) 
                 course.creator = request.user
                 course.teacher = course_form.cleaned_data['teacher']
-                # classmeeting_form.instance = course
+                course.save()
+                course.students.add(user)
                 if course.teacher:
-                    profile = course.teacher.profile # Assuming there is a profile relation in the User model
+                    course.students.set(user)
+                    profile = course.teacher.profile 
                     profile.is_teacher = True
                     profile.save()
 
-                # classmeeting_form.save()
-                course.save()
+                # course.save()
 
                 messages.success(request, ("Course created successfully!"))
                 Enrollment.objects.create(course=course, student=request.user)
                 return redirect('course_list')
         else:
             course_form = CourseForm() 
-            # classmeeting_form = ClassMeetingForm(prefix='class_meetings')
 
-        return render(request, 'create_course.html', {'course_form': course_form}) # 'classmeeting_form': classmeeting_form
+        return render(request, 'create_course.html', {'course_form': course_form})
     else:
         messages.success(request, ("You must be logged in to add a course!"))
         return redirect('login')
+    
+def create_study_request(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = StudyRequestForm(request.POST, user=request.user)
+            if form.is_valid():
+                study_request = form.save()
+                messages.success(request, ("You successfully created a study request!"))
+                return redirect('course_list')
+        else:
+            form = StudyRequestForm(user=request.user)
+        
+        return render(request, 'create_study_request.html', {'form': form})
+    else:
+        messages.success(request, ("You must be logged in to request a group study!"))
+        return redirect('login')
+
+def group_study_request(request):
+    if request.user.is_authenticated:
+        form = GroupStudyForm(user=request.user)  # default form for GET request
+        if request.method == 'POST':
+            form = GroupStudyForm(request.POST, user=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request,("You successfully created a group study meeting!"))
+                return redirect('course_list')
+        
+        # Return render for both GET and POST when form is not valid
+        return render(request, 'group_study_meeting.html', {'form': form})
+    
+    else:
+        messages.error(request, ("You must be logged in to request a group study!"))
+        return redirect('login')
+
+
 
 def course_detail(request, pk):
     course = get_object_or_404(Course, pk=pk)

@@ -86,14 +86,13 @@ class Course(models.Model):
     def __str__(self):
         return self.title if self.title else 'No Title'
     
-class ClassMeeting(models.Model):
+class GroupStudyMeeting(models.Model):
     MEETING_TYPES = [
         ('ONLINE', 'Online'),
         ('IN_PERSON', 'In-person'),
         ('HYBRID', 'Hybrid'),
     ]
     MERIDIEM_CHOICES = [
-    ('--', '--'),
     ('AM', 'AM'),
     ('PM', 'PM'),
     ]
@@ -102,18 +101,18 @@ class ClassMeeting(models.Model):
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    start_time_meridiem = models.CharField(max_length=2, choices=MERIDIEM_CHOICES, default='--')
-    end_time_meridiem = models.CharField(max_length=2, choices=MERIDIEM_CHOICES,  default='--')
+    start_time_meridiem = models.CharField(max_length=2, choices=MERIDIEM_CHOICES)
+    end_time_meridiem = models.CharField(max_length=2, choices=MERIDIEM_CHOICES)
     location = models.CharField(max_length=255, blank=True, null=True)
     meeting_link = models.URLField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
     class Meta:
-        verbose_name = "Class Meeting"
-        verbose_name_plural = "Class Meetings"
+        verbose_name = "Group Meeting"
+        verbose_name_plural = "Group Meetings"
     
     def __str__(self):
-        return f"{self.course.course_subject} - {self.date} - {self.start_time} to {self.end_time}"
+        return f"{self.course.title} - {self.date} - {self.start_time}"
 
 
 class Enrollment(models.Model):

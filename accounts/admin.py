@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
-from .models import Profile, Comment, Course, Enrollment, CourseCategory
+from .models import Profile, Comment, Course, Enrollment, CourseCategory, GroupStudyMeeting
 
 # Mix Profile info into User info
 class ProfileInline(admin.StackedInline):
@@ -36,3 +36,5 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ('title', 'subject', 'category', 'teacher',)
 admin.site.register(CourseCategory)
 admin.site.register(Enrollment)
+
+admin.site.register(GroupStudyMeeting)

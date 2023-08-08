@@ -1,9 +1,10 @@
 from django import forms 
 from django.forms import inlineformset_factory
-from .models import Comment, Profile, Course, CourseCategory, ClassMeeting
+from .models import Comment, Profile, Course, CourseCategory, GroupStudyMeeting
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.validators import MaxLengthValidator
+from django.core.exceptions import ValidationError
 
 class CommentForm(forms.ModelForm):
     body = forms.CharField(required=True,
@@ -92,33 +93,91 @@ class CourseForm(forms.ModelForm):
             'open_enrollment': forms.CheckboxInput(),
         }
 
+class StudyRequestForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(StudyRequestForm, self).__init__(*args, **kwargs)
 
-# class ClassMeetingForm(forms.ModelForm):
+    class Meta:
+        model = GroupStudyMeeting
+        fields = ['course', 'meeting_type', 'date', 'start_time', 'end_time', 'location', 
+                    'start_time_meridiem', 'end_time_meridiem', 'meeting_link', 'description']
+        labels = {
+            'course': 'Course',
+            'meeting_type': 'Select Meeting Type ',
+            'date': "Date: ",
+            'start_time': 'Start Time ',
+            'end_time': 'End Time',
+            'start_time_meridiem': 'AM/PM',
+            'end_time_meridiem': 'AM/PM',
+            'location': 'Meeting Location',
+            'meeting_link': 'Meeting Link',
+            'description': 'Meeting Description',
+
+        }
+        widgets = {
+            'course': forms.Select(), 
+            'meeting_type': forms.Select(),
+            'date': forms.DateInput(attrs={'placeholder': 'Meeting date (MM/DD)'}),
+            'start_time': forms.TimeInput(attrs={'placeholder': 'start time (--:--)'}),
+            'end_time': forms.TimeInput(attrs={'placeholder': 'end time(--:--)'}),
+            'start_time_meridiem': forms.Select(),
+            'end_time_meridiem': forms.Select(),
+            'location': forms.TextInput(attrs={'placeholder': 'Enter meeting location'}),
+            'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
+        }
+        required = {
+            'meeting_type': False,
+            'date': True,
+            'start_time': True,
+            'end_time': False,
+            'location': False,
+            'meeting_link': False,
+            'description': False,
+        }
     
-#     class Meta:
-#         model = ClassMeeting
-#         fields = ['meeting_type', 'date', 'start_time', 'end_time', 'location', 
-#                   'start_time_meridiem', 'end_time_meridiem', 'meeting_link', 'description']
-#         widgets = {
-#             'meeting_type': forms.Select(),
-#             'date': forms.DateInput(attrs={'placeholder': 'Enter course start date'}),
-#             'start_time': forms.TimeInput(attrs={'placeholder': 'start time (--:--)'}),
-#             'end_time': forms.TimeInput(attrs={'placeholder': 'end time(--:--)'}),
-#             'start_time_meridiem': forms.Select(),
-#             'end_time_meridiem': forms.Select(),
-#             'location': forms.TextInput(attrs={'placeholder': 'Enter location'}),
-#             'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
-#             'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
-#         }
-#         required = {
-#             'meeting_type': False,
-#             'date': False,
-#             'start_time': False,
-#             'end_time': False,
-#             'location': False,
-#             'meeting_link': False,
-#             'description': False,
-#         }
+class GroupStudyForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(GroupStudyForm, self).__init__(*args, **kwargs)
+        self.fields['course'].queryset = Course.objects.filter(students=user)
+
+        # Explicitly mark certain fields as not required
+        self.fields['meeting_type'].required = False
+        self.fields['location'].required = False
+        self.fields['meeting_link'].required = False
+        self.fields['description'].required = False
+
+    class Meta:
+        model = GroupStudyMeeting
+        fields = ['course', 'meeting_type', 'date', 'start_time', 'end_time', 'location', 
+                  'start_time_meridiem', 'end_time_meridiem', 'meeting_link', 'description']
+        
+        widgets = {
+            'meeting_type': forms.Select(),
+            'date': forms.DateInput(attrs={'placeholder': '*date (YYYY-MM-DD)'}),
+            'start_time': forms.TimeInput(attrs={'placeholder': '*start time (--:--)'}),
+            'end_time': forms.TimeInput(attrs={'placeholder': '*end time (--:--)'}),
+            'start_time_meridiem': forms.Select(),
+            'end_time_meridiem': forms.Select(),
+            'location': forms.TextInput(attrs={'placeholder': 'meeting location'}),
+            'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
+        }
+        labels = {
+            'course': '*Select Course',
+            'meeting_type': 'Select Meeting Type ',
+            'date': "Date: ",
+            'start_time': 'Start Time ',
+            'end_time': 'End Time',
+            'start_time_meridiem': '*AM/PM',
+            'end_time_meridiem': '*AM/PM',
+            'location': 'Meeting Location',
+            'meeting_link': 'Meeting Link',
+            'description': 'Meeting Description',
+        }
 
 
-# ClassMeetingFormSet = inlineformset_factory(Course, ClassMeeting, form=ClassMeetingForm, extra=1)
+
+
