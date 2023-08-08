@@ -29,6 +29,10 @@ admin.site.register(User, UserAdmin)
 
 admin.site.register(Comment)
 
-admin.site.register(Course)
+# admin.site.register(Course)
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('title', 'subject', 'category', 'teacher',)
+    search_fields = ('title', 'subject', 'category', 'teacher',)
 admin.site.register(CourseCategory)
 admin.site.register(Enrollment)

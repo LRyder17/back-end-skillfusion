@@ -14,6 +14,7 @@ urlpatterns = [
     path('register/', views.register_user, name='register'),
     path('update_user/', views.update_user, name='update_user'),
     path('create_course/', views.create_course, name='create_course'),
+    path('set_meeting/<course_id>/', views.set_meeting, name='set_meeting'),
     path('courses/', views.course_list, name='course_list'),
     path('courses/<int:pk>/', views.course_detail, name='course_detail'),
     path('courses/subject/<str:subject>/', views.courses_by_subject, name='courses_by_subject'),
