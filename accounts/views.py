@@ -163,7 +163,6 @@ def create_course(request):
         messages.success(request, ("You must be logged in to add a course!"))
         return redirect('login')
 
-
 def course_detail(request, pk):
     course = get_object_or_404(Course, pk=pk)
     can_enroll = False
