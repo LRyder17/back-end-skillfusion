@@ -167,27 +167,24 @@ def profile(request, pk):
 def create_course(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            course_form = CourseForm(request.POST, request.FILES)
+            course_form = CourseForm(request.POST, request.FILES, user=request.user)
             if course_form.is_valid():
-                user = request.user
                 course = course_form.save(commit=False) 
                 course.creator = request.user
                 course.teacher = course_form.cleaned_data['teacher']
                 course.save()
-                course.students.add(user)
+                course.students.add(request.user)
                 if course.teacher:
-                    course.students.set(user)
+                    course.students.add(course.teacher)
                     profile = course.teacher.profile 
                     profile.is_teacher = True
                     profile.save()
-
-                # course.save()
 
                 messages.success(request, ("Course created successfully!"))
                 Enrollment.objects.create(course=course, student=request.user)
                 return redirect('course_list')
         else:
-            course_form = CourseForm() 
+            course_form = CourseForm(user=request.user) 
 
         return render(request, 'create_course.html', {'course_form': course_form})
     else:

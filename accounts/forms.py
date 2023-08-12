@@ -58,10 +58,21 @@ class ProfilePicForm(forms.ModelForm):
 
 class CourseForm(forms.ModelForm):
     course_image = forms.ImageField(label="Course Image", required=False)
-    teacher = forms.ModelChoiceField(queryset=User.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-select'}))
+    # teacher = forms.ModelChoiceField(queryset=User.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-select'}))
     category = forms.ModelChoiceField(queryset=CourseCategory.objects.all(), 
                                       required=False, 
                                       widget=forms.Select(attrs={'class': 'form-select'}))
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(CourseForm, self).__init__(*args, **kwargs)
+
+        if user:
+            self.fields['teacher'] = forms.ModelChoiceField(
+                queryset=User.objects.filter(id=user.id),
+                required=False,
+                widget=forms.Select(attrs={'class': 'form-select'})   
+            )
     
     class Meta:
         model = Course
