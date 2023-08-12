@@ -59,6 +59,7 @@ class Course(models.Model):
     ]
 
     course_image = models.ImageField(null=True, blank=True, upload_to="images/")
+    start_date = models.DateField(null=True, blank=True)
     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, null=True, blank=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # Allowing null values
     created_at = models.DateTimeField(auto_now_add=True)

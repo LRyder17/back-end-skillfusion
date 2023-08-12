@@ -23,9 +23,11 @@ Fields with asterisks are required
         {{ course_form.teacher.label_tag }}
         {{ course_form.teacher }}
     </div>
-    <div class="col-4">
+    <div class="col-2">
     </div>
     <div class="col-4">
+        {{ course_form.start_date.label_tag }}
+        {{ course_form.start_date }}
     </div>
     <div class="col-md-6">
         {{ course_form.duration_in_weeks }}
@@ -48,36 +50,8 @@ Fields with asterisks are required
         {{ course_form.open_enrollment.label_tag }}
         {{ course_form.open_enrollment }}
     </div>
-    {% comment %} <div class="col-md-6">
-        {{ classmeeting_form.start_time }}
-    </div>
-    <div class="col-md-6">
-        {{ course_form.class_frequency }}
-    </div>
     <div class="col-12">
-        {{ classmeeting_form.start_time_meridiem }} 
-    </div>
-    <div class="col-md-6">
-        {{ classmeeting_form.end_time }}
-    </div>
-    <div class="col-md-6">
-        {{ classmeeting_form.location }}
-    </div>
-    <div class="col-12">
-        {{ classmeeting_form.end_time_meridiem }} 
-    </div>
-    <div class="col-12">
-        {{ classmeeting_form.meeting_type.label_tag }}
-        {{ classmeeting_form.meeting_type }}
-    </div>
-    <div class="col-12">
-        {{ classmeeting_form.meeting_link }}
-    </div>
-    <div class="col-12">
-        {{ classmeeting_form.description }}
-    </div> {% endcomment %}
-    <div class="col-12">
-      <button type="submit" class="btn btn-primary">Create Course</button>
+      <button type="submit" class="btn btn-success">Create Course</button>
     </div>
   </form>
   
