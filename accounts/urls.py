@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     # Home
+    # path('', views.course_comments, name="course_comments"),
     path('course_comments/<int:course_id>', views.course_comments, name="course_comments"),
 
     # Authentication

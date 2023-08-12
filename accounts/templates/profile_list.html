@@ -27,7 +27,7 @@ Profile List - Skill Fusion
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
-                        <h5 class="card-title"> {{ profile.user.username }} </h5>
+                        <h5 class="card-title"> {{ profile.user.first_name }} </h5>
                         <p class="card-text">
                             <a href="{% url 'profile' profile.user.id %}">
                                 @{{ profile.user.username|lower }}

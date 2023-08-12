@@ -421,7 +421,7 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request,("You have been logged in!"))
-            return redirect('home')
+            return redirect(reverse('profile', kwargs={'pk': request.user.profile.pk}))
         else:
             messages.success(request,("There was an error loggin in. Please try again!"))
             return redirect('login')
@@ -430,7 +430,7 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     messages.success(request,("You have been logged out successfully!"))
-    return redirect('home')
+    return redirect('login')
 
 def register_user(request):
     form = UserRegistrationForm()

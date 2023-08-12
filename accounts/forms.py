@@ -83,10 +83,11 @@ class CourseForm(forms.ModelForm):
     
     class Meta:
         model = Course
-        fields = ['course_image', 'title', 'subject', 'teacher', 'description', 'category', 'level_of_difficulty',
+        fields = ['course_image', 'title', 'course_start_date', 'subject', 'teacher', 'description', 'category', 'level_of_difficulty',
                   'duration_in_weeks', 'class_frequency', 'max_students', 'open_enrollment']
         labels = {
             'title': '',
+            'course_start_date': 'Start Date',
             'subject': '',
             'teacher': 'Select a Teacher',
             'description': '',
@@ -100,6 +101,7 @@ class CourseForm(forms.ModelForm):
         widgets = {
             'course_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'placeholder': '*Enter title of course', 'required': True}),
+            'course_start_date': forms.DateInput(attrs={'placeholder': '*date (YYYY-MM-DD)'}),
             'subject': forms.TextInput(attrs={'placeholder': '*Enter course subject', 'required': True}),
             'description': forms.Textarea(attrs={'placeholder': '*Enter course description', 'required': True}),
             'category': forms.Select(attrs={'class': 'form-select'}),
