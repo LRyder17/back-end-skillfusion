@@ -59,6 +59,27 @@ def home(request):
     else:
         comments = []
         return render(request, 'home.html', {"comments": comments})
+    
+def course_comments(request, pk):  # <- Pass course_id as a parameter
+    course = get_object_or_404(Course, id=pk)  # <- Fetch the course based on the course_id
+    if request.user.is_authenticated:
+        form = CommentForm(request.POST or None)
+        if request.method == "POST":
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.user = request.user
+                comment.course = course  # <- Assign the course to the comment before saving
+                comment.save()
+                messages.success(request, "Your comment has been posted successfully!")
+                return redirect(request.META.get("HTTP_REFERER"))
+
+        comments = Comment.objects.filter(course=course).order_by("-created_at")  # <- Fetch comments only for this course
+        return render(request, 'course_comments.html', {"course": course, "comments": comments, "form": form})
+    else:
+        comments = []
+        return render(request, 'course_comments.html', {"course": course, "comments": comments})
+
+
 
 def following_list(request, user_id):
     if request.user.is_authenticated:
@@ -205,7 +226,6 @@ def group_study_request(request):
     else:
         messages.error(request, ("You must be logged in to request a group study!"))
         return redirect('login')
-
 
 
 def course_detail(request, pk):

@@ -18,6 +18,7 @@ urlpatterns = [
     path('create_study_request/', views.create_study_request, name='create_study_request'),
     path('courses/', views.course_list, name='course_list'),
     path('courses/<int:pk>/', views.course_detail, name='course_detail'),
+    path('courses/<int:pk>/comments', views.course_comments, name='course_comments'),
     path('courses/subject/<str:subject>/', views.courses_by_subject, name='courses_by_subject'),
     path('courses/category/<int:category_id>/', views.courses_by_category, name='courses_by_category'),
     path('update_course/<course_id>/', views.update_course, name='update_course'),

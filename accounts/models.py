@@ -61,7 +61,7 @@ class Course(models.Model):
     course_image = models.ImageField(null=True, blank=True, upload_to="images/")
     start_date = models.DateField(null=True, blank=True)
     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, null=True, blank=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # Allowing null values
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=200)
@@ -130,8 +130,14 @@ class Enrollment(models.Model):
 class Comment(models.Model):
     user = models.ForeignKey(
         User, related_name="comments",
-        on_delete=models.DO_NOTHING
+        on_delete=models.SET_NULL,
+        null=True,
         )
+    course = models.ForeignKey(
+        Course, on_delete=models.CASCADE, 
+        related_name="course_comments", 
+        null=True)
+
     body = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name="comment_like", blank=True)
