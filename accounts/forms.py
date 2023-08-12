@@ -18,7 +18,7 @@ class CommentForm(forms.ModelForm):
                            )
     class Meta:
         model = Comment
-        exclude = ("user", "likes")
+        exclude = ("user", "likes", "course")
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(label ="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': "Email Address"}))
@@ -48,20 +48,38 @@ class UserRegistrationForm(UserCreationForm):
         self.fields['password2'].label = ''
         self.fields['password2'].help_text = '<span class="form-text text-muted small">Enter the same password for. They must be exactly the same.'
 
-class ProfilePicForm(forms.ModelForm):
+class ProfileForm(forms.ModelForm):
     profile_image = forms.ImageField(label="Profile Picture")
-    about_me = forms.CharField(widget=forms.Textarea, validators=[MaxLengthValidator(500)])
+    about_me = forms.CharField(
+        widget=forms.Textarea, 
+        validators=[MaxLengthValidator(500)])
+    interests = forms.ModelMultipleChoiceField(
+        queryset=CourseCategory.objects.all(),
+        widget=forms.CheckboxSelectMultiple(),
+        required=False,
+        label="Areas of Interest"
+    )
 
     class Meta:
         model = Profile
-        fields = ('profile_image', 'about_me')
+        fields = ('profile_image', 'about_me', 'interests')
 
 class CourseForm(forms.ModelForm):
     course_image = forms.ImageField(label="Course Image", required=False)
-    teacher = forms.ModelChoiceField(queryset=User.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-select'}))
     category = forms.ModelChoiceField(queryset=CourseCategory.objects.all(), 
                                       required=False, 
                                       widget=forms.Select(attrs={'class': 'form-select'}))
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(CourseForm, self).__init__(*args, **kwargs)
+
+        if user:
+            self.fields['teacher'] = forms.ModelChoiceField(
+                queryset=User.objects.filter(id=user.id),
+                required=False,
+                widget=forms.Select(attrs={'class': 'form-select'})   
+            )
     
     class Meta:
         model = Course
@@ -83,7 +101,6 @@ class CourseForm(forms.ModelForm):
             'course_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'placeholder': '*Enter title of course', 'required': True}),
             'subject': forms.TextInput(attrs={'placeholder': '*Enter course subject', 'required': True}),
-            'teacher': forms.Select(attrs={'class': 'form-select'}),
             'description': forms.Textarea(attrs={'placeholder': '*Enter course description', 'required': True}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'level_of_difficulty': forms.Select(choices=Course.LEVEL_CHOICES, attrs={'class': 'form-select'}),

@@ -5,9 +5,25 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 
+# *****************************  Course Category Model  ***************************
+
+class CourseCategory(models.Model):
+    title=models.CharField(max_length=100, null=True, blank=True)
+    description=models.TextField(null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural= "Course Categories"
+
+    def __str__(self):
+        return self.title
+
+
+# ************************** Profile Related Models **************************
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     about_me = models.TextField(null=True, blank=True)
+    interests = models.ManyToManyField(CourseCategory, related_name='user_interests', blank=True)
     is_teacher = models.BooleanField(default=False)
     follows = models.ManyToManyField("self",
                                     related_name="followed_by",
@@ -41,15 +57,7 @@ def create_profile(sender, instance, created, **kwargs):
 
 post_save.connect(create_profile, sender=User)
 
-class CourseCategory(models.Model):
-    title=models.CharField(max_length=100, null=True, blank=True)
-    description=models.TextField(null=True, blank=True)
-
-    class Meta:
-        verbose_name_plural= "Course Categories"
-
-    def __str__(self):
-        return self.title
+# *****************************  Course Model  ***************************
 
 class Course(models.Model):
     LEVEL_CHOICES = [
@@ -60,7 +68,8 @@ class Course(models.Model):
 
     course_image = models.ImageField(null=True, blank=True, upload_to="images/")
     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, null=True, blank=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # Allowing null values
+    course_start_date = models.DateField(null=True, blank=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=200)
@@ -82,9 +91,37 @@ class Course(models.Model):
 
     class Meta:
         verbose_name_plural="Courses"
+    
+    def check_max_students(self):
+        if self.max_students is not None:
+            student_count = self.enrolled_courses.count()
+            if student_count >= self.max_students:
+                self.open_enrollment = False
+                self.save()
+    
+    def has_study_request(self):
+        return GroupStudyMeeting.objects.filter(course=self).exists()
 
     def __str__(self):
         return self.title if self.title else 'No Title'
+
+
+class Enrollment(models.Model):
+    course=models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrolled_courses')
+    student=models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrolled_students')
+    enrolled_time=models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural="Enrolled Courses"
+    
+    def save(self, *args, **kwargs):
+        super(Enrollment, self).save(*args, **kwargs)
+        self.course.check_max_students()
+    
+    def __str__(self):
+        return f"{self.student} enrolled in {self.course}"
+
+# **************************** Class Meeting Modles *****************
     
 class GroupStudyMeeting(models.Model):
     MEETING_TYPES = [
@@ -114,23 +151,17 @@ class GroupStudyMeeting(models.Model):
     def __str__(self):
         return f"{self.course.title} - {self.date} - {self.start_time}"
 
-
-class Enrollment(models.Model):
-    course=models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrolled_courses')
-    student=models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrolled_students')
-    enrolled_time=models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name_plural="Enrolled Courses"
-    
-    def __str__(self):
-        return f"{self.student} enrolled in {self.course}"
+# ************************** Comment Model **************************
 
 class Comment(models.Model):
     user = models.ForeignKey(
         User, related_name="comments",
-        on_delete=models.DO_NOTHING
+        on_delete=models.SET_NULL, null=True
         )
+    course = models.ForeignKey(
+        Course, related_name="course_comments",
+        on_delete=models.CASCADE, null=True
+    )
     body = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name="comment_like", blank=True)

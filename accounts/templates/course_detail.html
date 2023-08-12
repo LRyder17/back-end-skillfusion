@@ -2,40 +2,92 @@
 {% load static %}
 {% block content %}
 
-<div class="col-md-6 offset-md-3">
-<h1>{{ course.title }}</h1>
-<form method="POST">
-    {% csrf_token %}
-    {% if user.is_authenticated and user != course.creator %}
-        {% if course in user.enrolled_courses.all %}
-        <button 
-            class="btn btn-outline-danger" 
-            name="enrollment"
-            value="unenroll" 
-            type="submit">Unenroll from {{ course.title }} 
-        </button>
-    {% else %}
-        <button 
-            class="btn btn-outline-success" 
-            name="enrollment"
-            value="enroll" 
-            type="submit">Enroll in {{ course.title }} 
-        </button>
-    {% endif %}
-{% elif not user.is_authenticated %}
-    <a href="{% url 'login' %}" class="btn btn-outline-primary">Login to Enroll</a>
-    {% endif %}
-<br/><br/>
-</form>
-<td align="right">
-    <div>
-        <a href="{% url 'update_course' course.id %}" class="btn btn-outline-secondary"> Update Course </a>
+
+<div class="row">
+    <div class="col-5">
+        {% if course.course_image %}
+            <br/><br/>
+            <img src="{{ course.course_image.url }}" class="card-img-top" style="width: 30rem;" alt="">
+        {% else %}
+            <img src="{% static 'images/skillfusion.png' %}" class="card-img-top" style="width: 30rem;" alt="">
+        {% endif %}
     </div>
-    <br/>
-    <div>
-        <a href="{% url 'delete_course' course.id %}" class="btn btn-outline-danger">Delete Course</a>
+    <div class="col-6">
+        <br/><br/>
+        <div class="card border-success mb-3" style="max-width: 30rem;">
+            <div class="card-header text-center"><h5>{{ course.title }}</h5></div>
+            <div class="card-body text-dark">
+                {% if course.course_start_date %}
+                <p class="card-text"><strong>Start Date:</strong> {{ course.course_start_date }} </p>
+                {% else %}
+                <p class="card-text"><strong>Start Date:</strong> None </p>
+                {% endif %}
+                <p class="card-text"><strong>Subject:</strong> {{ course.subject }} </p>
+                <p class="card-text"><strong>Course Description:</strong> {{ course.description }}</p>
+                <p class="card-text"><strong>Enrolled Student Count:</strong> {{ enrolled_students_count }}</p>
+            </div>
+            {% if course.open_enrollment %}
+                <div class="card-footer bg-transparent border-success text-success text-center">Open Enrollment</div>
+            {% else %}
+                <div class="card-footer bg-transparent border-success text-danger">Enrollment Closed</div>
+            {% endif %}
+            </div>
     </div>
-</td>
-  
 </div>
+<div class="row">
+    <br/><br/><br/>
+</div>
+<div class="row">
+    {% if user.is_authenticated and user == course.creator %}
+        <td align="right">
+            <div class="col-2">
+                <a href="{% url 'update_course' course.id %}" class="btn btn-outline-secondary"> Update Course </a>
+            </div>
+            <br/>
+            <div class="col-3">
+                <a href="{% url 'delete_course' course.id %}" class="btn btn-outline-danger">Delete Course</a>
+            </div>
+            <div class="col-2">
+                <a href="{% url 'course_comments' course.id %}" class="btn btn-outline-secondary"> View/Post Comment </a>
+            </div>
+        </td>
+    {% elif user.is_authenticated and user != course.creator %}
+    <form method="post" action="{% url 'course_detail' course.pk %}">
+        {% csrf_token %}  
+        {% if course in user.enrolled_courses.all %}
+            <div class="col-3">
+                <button 
+                    class="btn btn-outline-danger" 
+                    name="enrollment"
+                    value="unenroll" 
+                    type="submit">Unenroll from {{ course.title }} 
+                </button>
+            </div>
+        {% else %}
+            <div class="col-3">
+                <button 
+                    class="btn btn-outline-success" 
+                    name="enrollment"
+                    value="enroll" 
+                    type="submit">Enroll in {{ course.title }} 
+                </button>
+            </div>
+        {% endif %}
+    </form>  
+{% elif not user.is_authenticated %}
+    <div class="row">
+        <br/>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <a href="{% url 'login' %}" class="btn btn-outline-primary">Login to Enroll</a>
+        </div>
+    </div>
+{% endif %}
+<br/><br/>
+</div>
+</div>
+</div>
+
 {% endblock %}
+

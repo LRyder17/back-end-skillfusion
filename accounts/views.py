@@ -1,18 +1,20 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
+from .serializers import (
+        ProfileSerializer, CommentSerializer, CourseSerializer, 
+        EnrollmentSerializer, GroupStudyMeetingSerializer)
 from django.contrib import messages
-from django.http import JsonResponse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .google_auth import flow
 from oauth2client.client import OAuth2Credentials
 # from googleapiclient.discovery import build
 # from google.oauth2 import service_account
 from django.views.decorators.csrf import csrf_exempt
-from .models import Profile, Comment, Course, Enrollment   
+from .models import Profile, Comment, Course, Enrollment, GroupStudyMeeting   
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm, GroupStudyForm, StudyRequestForm
+from .forms import CommentForm, UserRegistrationForm, ProfileForm, CourseForm, GroupStudyForm, StudyRequestForm
 from django.contrib.auth.models import User
 from django.utils import timezone
 import calendar
@@ -43,22 +45,54 @@ def upload_to_s3(file):
     file_to_upload = BytesIO(content)
     s3.upload_fileobj(file_to_upload, 'skillfusion', 'images/' + file.name)
 
-def home(request):
+def notes_text(request):
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=class_notes.txt'
+
+    lines = ["Add your class notes here...\n",
+             "Course: \n",
+             "Date: \n", ]
+    
+    response.writelines(lines)
+    return response
+
+# def course_comments(request):
+#     if request.user.is_authenticated:
+#         form = CommentForm(request.POST or None)
+#         if request.method == "POST":
+#             if form.is_valid():
+#                 comment = form.save(commit=False)
+#                 comment.user = request.user
+#                 comment.save()
+#                 messages.success(request,("Your comment has been posted successfully!"))
+#                 return redirect(request.META.get("HTTP_REFERER"))
+            
+#         comments = Comment.objects.all().order_by("-created_at")
+#         return render(request, 'course_comments.html', {"comments": comments, "form": form})
+#     else:
+#         comments = []
+#         return render(request, 'course_comments.html', {"comments": comments})
+
+def course_comments(request, course_id):
+    course = get_object_or_404(Course, id=course_id)  # get the specific course or return 404 if not found
+
     if request.user.is_authenticated:
         form = CommentForm(request.POST or None)
         if request.method == "POST":
             if form.is_valid():
                 comment = form.save(commit=False)
                 comment.user = request.user
+                comment.course = course  # associate the comment with the specific course
                 comment.save()
-                messages.success(request,("Your comment has been posted successfully!"))
+                messages.success(request, "Your comment has been posted successfully!")
                 return redirect(request.META.get("HTTP_REFERER"))
-            
-        comments = Comment.objects.all().order_by("-created_at")
-        return render(request, 'home.html', {"comments": comments, "form": form})
+
+        comments = Comment.objects.filter(course=course).order_by("-created_at")  # filter comments by course
+        return render(request, 'course_comments.html', {"comments": comments, "form": form, "course": course})
     else:
         comments = []
-        return render(request, 'home.html', {"comments": comments})
+        return render(request, 'course_comments.html', {"comments": comments, "course": course})
+
 
 def following_list(request, user_id):
     if request.user.is_authenticated:
@@ -87,6 +121,7 @@ def comment_like(request, pk):
             comment.likes.add(request.user)
     
         return redirect(request.META.get("HTTP_REFERER"))
+        
 
 def comment_show(request, pk):
     comment = get_object_or_404(Comment, id=pk)
@@ -95,6 +130,7 @@ def comment_show(request, pk):
     else:
         messages.success(request, ("That Comment Does Not Exist!"))
         return redirect('home')
+
     
 def delete_comment(request, pk):
     if request.user.is_authenticated:
@@ -121,73 +157,72 @@ def profile_list(request):
         return redirect(request.META.get("HTTP_REFERER"))
     
 def profile(request, pk):
-    if request.user.is_authenticated:
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to view this page.")
+        return redirect(request.META.get("HTTP_REFERER", 'login'))
+
+    try:
         profile = Profile.objects.get(user_id=pk)
-        comments = Comment.objects.filter(user_id=pk).order_by("-created_at")
-        # Post form logic
-        if request.method == "POST":
-            # Get current user ID
-            current_user_profile = request.user.profile
-            # Get Form Data
-            action = request.POST.get('follow')
-            # Decide to follow or unfollow
-            if action == "unfollow":
-                current_user_profile.follows.remove(profile)
-            elif action == "follow":
-                current_user_profile.follows.add(profile)
-            # Save profile
-            current_user_profile.save()
+    except Profile.DoesNotExist:
+        messages.error(request, "Profile not found.")
+        return redirect('home')
 
-        return render(request, "profile.html", {"profile": profile, "comments": comments})
-    else:
-        messages.success(request,("You must be logged in to view this page"))
-        return redirect(request.META.get("HTTP_REFERER"))
+    comments = Comment.objects.filter(user_id=pk).order_by("-created_at")
 
+    if request.method == "POST":
+        current_user_profile = request.user.profile
+        action = request.POST.get('follow')
+        if action == "unfollow":
+            current_user_profile.follows.remove(profile)
+        elif action == "follow":
+            current_user_profile.follows.add(profile)
+        current_user_profile.save()
+
+    return render(request, "profile.html", {"profile": profile, "comments": comments})
+
+    
 def create_course(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            course_form = CourseForm(request.POST, request.FILES)
+            course_form = CourseForm(request.POST, request.FILES, user=request.user)
             if course_form.is_valid():
-                user = request.user
                 course = course_form.save(commit=False) 
                 course.creator = request.user
                 course.teacher = course_form.cleaned_data['teacher']
                 course.save()
-                course.students.add(user)
+                course.students.add(request.user)
                 if course.teacher:
-                    course.students.set(user)
+                    course.students.add(course.teacher)
                     profile = course.teacher.profile 
                     profile.is_teacher = True
                     profile.save()
-
-                # course.save()
 
                 messages.success(request, ("Course created successfully!"))
                 Enrollment.objects.create(course=course, student=request.user)
                 return redirect('course_list')
         else:
-            course_form = CourseForm() 
+            course_form = CourseForm(user=request.user) 
 
         return render(request, 'create_course.html', {'course_form': course_form})
     else:
         messages.success(request, ("You must be logged in to add a course!"))
         return redirect('login')
     
-def create_study_request(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = StudyRequestForm(request.POST, user=request.user)
-            if form.is_valid():
-                study_request = form.save()
-                messages.success(request, ("You successfully created a study request!"))
-                return redirect('course_list')
-        else:
-            form = StudyRequestForm(user=request.user)
+# def create_study_request(request):
+#     if request.user.is_authenticated:
+#         if request.method == 'POST':
+#             form = StudyRequestForm(request.POST, user=request.user)
+#             if form.is_valid():
+#                 study_request = form.save()
+#                 messages.success(request, ("You successfully created a study request!"))
+#                 return redirect('course_list')
+#         else:
+#             form = StudyRequestForm(user=request.user)
         
-        return render(request, 'create_study_request.html', {'form': form})
-    else:
-        messages.success(request, ("You must be logged in to request a group study!"))
-        return redirect('login')
+#         return render(request, 'create_study_request.html', {'form': form})
+#     else:
+#         messages.success(request, ("You must be logged in to request a group study!"))
+#         return redirect('login')
 
 def group_study_request(request):
     if request.user.is_authenticated:
@@ -198,48 +233,132 @@ def group_study_request(request):
                 form.save()
                 messages.success(request,("You successfully created a group study meeting!"))
                 return redirect('course_list')
+        context = {
+            'form': form,
+            'previous_page': request.META.get('HTTP_REFERER', None) 
+            }
         
         # Return render for both GET and POST when form is not valid
-        return render(request, 'group_study_meeting.html', {'form': form})
+        return render(request, 'group_study_request.html', context)
     
     else:
         messages.error(request, ("You must be logged in to request a group study!"))
         return redirect('login')
 
-
-
+def update_study_request(request, id):
+    if request.user.is_authenticated:
+        study_request = get_object_or_404(GroupStudyMeeting, id=id)
+        # form = GroupStudyForm(user=request.user)  # default form for GET request
+        if request.method == 'POST':
+            form = GroupStudyForm(request.POST, instance=study_request, user=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success (request,
+                            ("You successfully update the group study meeting request!"))
+                return redirect('course_list')
+        else:
+            form = GroupStudyForm(instance=study_request, user=request.user)
+        
+        context = {
+            'study_request': study_request,
+            'form': form,
+            'previous_page': request.META.get('HTTP_REFERER', None)     
+        }
+        # Return render for both GET and POST when form is not valid
+        return render(request, 'update_study_request.html', context)
+    
+    else:
+        messages.error(request, ("You must be logged in to update a group study request!"))
+        return redirect('login')
+    
+def delete_study_request(request, id):
+    if request.user.is_authenticated:
+        study_request = GroupStudyMeeting.objects.get(id=id)
+        study_request.delete()
+        return redirect('home')
+    else:
+        messages.error(request, ("You must be logged in to view this page!"))
+        return redirect('login')
+    
 def course_detail(request, pk):
     course = get_object_or_404(Course, pk=pk)
+    enrolled_students_count = course.students.count()
     can_enroll = False
+
+    comments = Comment.objects.filter(course=course).order_by("-created_at")
+
+    form = None
     if request.user.is_authenticated:
-        # Enrollment logic
-        if request.method == "POST":
-            action = request.POST.get('enrollment')
-            if action == "unenroll":
-                # Unenroll the user from the course
-                Enrollment.objects.filter(course=course, student=request.user).delete()
-                course.students.remove(request.user)
+        form = CommentForm(request.POST or None)
+        
+        if request.method == "POST":        
+            action = request.POST.get('action')
+            
+            # Comment logic
+            if action == "comment":
+                if form.is_valid():
+                    comment = form.save(commit=False)
+                    comment.user = request.user
+                    comment.course = course  # associate the comment with the course
+                    comment.save()
+                    messages.success(request, ("Your comment has been posted successfully!"))
+                    return redirect(request.META.get("HTTP_REFERER"))
+            
+            # Enrollment logic
             elif action == "enroll":
                 # Enroll the user in the course
                 Enrollment.objects.create(course=course, student=request.user, enrolled_time=timezone.now())
                 course.students.add(request.user)
+            elif action == "unenroll":
+                # Unenroll the user from the course
+                Enrollment.objects.filter(course=course, student=request.user).delete()
+                course.students.remove(request.user)
             course.save()
 
-        return render(request, "course_detail.html", {"course": course})
-    else:
-        return render(request, "course_detail.html", {"course": course})
+    # Common context for both authenticated and non-authenticated users
+    context = {
+        "course": course,
+        "enrolled_students_count": enrolled_students_count,
+        "comments": comments
+    }
     
+    # Only include form in context if user is authenticated
+    if form:
+        context["form"] = form
+
+    return render(request, "course_detail.html", context)
+
+def study_request_list(request):
+    if request.user.is_authenticated:
+        enrollments = Enrollment.objects.filter(student=request.user)
+        enrolled_courses = [enrollment.course for enrollment in enrollments]
+
+        # Filter study requests based on the enrolled courses
+        study_request_list = GroupStudyMeeting.objects.filter(course__in=enrolled_courses)
+        return render(request, 'study_request_list.html', {'study_request_list': study_request_list})
+    else:
+        messages.success(request,("You must be logged in to view study requests!"))
+        return redirect('login')
+
 def course_list(request):
     course_list = Course.objects.all()
     return render(request, 'course_list.html', {'course_list': course_list})
 
+
 def courses_by_subject(request, subject):
     course_list = Course.objects.filter(subject=subject)
-    return render(request, 'course_list.html', {'course_list': course_list})
+    no_courses_found = not course_list.exists()
+
+    return render(request, 'course_list.html', {'course_list': course_list, 
+                                                'no_courses_found': no_courses_found})
+
 
 def courses_by_category(request, category_id):
     course_list = Course.objects.filter(category_id=category_id)
-    return render(request, 'course_list.html', {'course_list': course_list})
+    no_courses_found = not course_list.exists()
+
+    return render(request, 'course_list.html', {'course_list': course_list, 
+                                                'no_courses_found': no_courses_found})
 
 def my_courses(request):
     if request.user.is_authenticated:
@@ -256,7 +375,14 @@ def update_course(request, course_id):
     if form.is_valid():
         form.save()
         return redirect('course_list')
-    return render(request, 'update_course.html', {'course': course, 'form': form})
+    
+    context = {
+        'course': course,
+        'form': form,
+        'previous_page': reverse('my_courses')
+    }
+
+    return render(request, 'update_course.html', context)
 
 def search_courses(request):
     if request.method == "POST":
@@ -266,6 +392,7 @@ def search_courses(request):
                                                        'courses': courses})
     else:
         return render(request, 'search_courses.html', {})
+
 
 def delete_course(request, pk):
     course = Course.objects.get(pk=pk)
@@ -329,7 +456,7 @@ def update_user(request):
         profile_user = Profile.objects.get(user__id=request.user.id)
         # Get forms
         user_form = UserRegistrationForm(request.POST or None, request.FILES or None, instance=current_user)
-        profile_form = ProfilePicForm(request.POST or None, request.FILES or None, instance=profile_user)
+        profile_form = ProfileForm(request.POST or None, request.FILES or None, instance=profile_user)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -338,8 +465,13 @@ def update_user(request):
 
             messages.success(request, ("Your profile information has been updated"))
             return redirect(reverse('profile', kwargs={'pk': request.user.profile.pk}))
+        
+        context = {'user_form': user_form, 
+                   'profile_form': profile_form,
+                   'profile_url': reverse('profile', kwargs={'pk': request.user.profile.pk})
+                   }
 
-        return render(request, "update_user.html", {'user_form': user_form, 'profile_form': profile_form})
+        return render(request, "update_user.html", context)
     else:
         messages.success(request, ("You must be logged in to update your profile!"))
         return redirect('home')

@@ -6,7 +6,6 @@
 <h1>Create a Group Study Request</h1>
 <br/>
 <br/>
-<br/>
 <strong>Fields with asterisks are required</strong>
 <br/>
 <br/>
@@ -51,8 +50,11 @@
     <div class="col-12">
         {{ form.description }}
     </div> 
-    <div class="col-12">
-      <button type="submit" class="btn btn-primary">Submit Request</button>
+    <div class="col-3">
+      <button type="submit" class="btn btn-success">Submit Request</button>
+    </div>
+    <div class="col-3">
+        <a href="{{ previous_page }}" class="btn btn-outline-danger">Cancel</a>
     </div>
   </form>
   

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="col-md-6 offset-md-3">
+<h1>Update Group Study Request</h1>
+<br/>
+<br/>
+<br/>
+<strong>Fields with asterisks are required</strong>
+<br/>
+<br/>
+<form class="row g-3" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="col-md-6">
+        {{ form.course.label_tag }}
+        {{ form.course }}
+    </div>
+    <div class="col-md-6">
+        {{ form.date }}
+    </div>
+    <br/>
+    <div class="col-md-6">
+        {{ form.start_time }} 
+    </div>
+    <div class="col-md-6">
+        {{ form.end_time }}
+    </div>
+    <br/>
+    <div class="col-md-6">
+        {{ form.start_time_meridiem.label_tag }} 
+        {{ form.start_time_meridiem }} 
+    </div>  
+    <div class="col-md-6">
+        {{ form.end_time_meridiem.label_tag }} 
+        {{ form.end_time_meridiem }} 
+    </div>
+    <br/>
+    <div class="col-md-6">
+        {{ form.meeting_type.label_tag }}
+        {{ form.meeting_type }}
+    </div>
+    <div class="col-md-6">
+        {{ form.location }}
+    </div>
+    <br/>
+    <div class="col-12">
+        {{ form.meeting_link }}
+    </div>
+    <br/>
+    <div class="col-12">
+        {{ form.description }}
+    </div> 
+    <div class="row">
+    <div class="col-3">
+      <button type="submit" class="btn btn-secondary">Update Request</button>
+    </div>
+    <div class="col-3">
+        <a href="{{ previous_page }}" class="btn btn-outline-danger">Cancel</a>
+    </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

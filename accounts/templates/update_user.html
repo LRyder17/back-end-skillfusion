@@ -6,12 +6,20 @@
     <br/>
     <form method ="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
+        <br/>
         {{ profile_form.as_p}}
         <br/>
         {{ user_form.as_p }}
         <br/>
-        <button type="submit" class="btn btn-outline-primary">Update</button>
+        <div class="row">
+            <div class="col-3">
+                <button type="submit" class="btn btn-outline-success">Update</button>
+            </div>
+            <div class="col-3">
+                <a href="{{ profile_url }}" class="btn btn-outline-danger">Cancel</a>
+            </div>
+        </div>
     </form>
-    
     </div>
+    <br/><br/><br/>
 {% endblock %}

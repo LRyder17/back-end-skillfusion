@@ -2,14 +2,15 @@
 {% load static %}
 {% block content %}
 <div class="col-md-6 offset-md-3">
-    <h1>Update Detils for {{ course.title }}</h1>
+    <h1>Update Details for {{ course.title }}</h1>
     <br/>
     <form method ="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <br/>
-        <button type="submit" class="btn btn-outline-primary">Update</button>
+        <button type="submit" class="btn btn-outline-secondary">Update</button>
+        <a href="{{ previous_page }}" class="btn btn-outline-danger">Cancel</a>
     </form>
-    
-    </div>
+    <br/><br/><br/><br/> 
+</div>
 {% endblock %}
