@@ -21,6 +21,9 @@
             value="enroll" 
             type="submit">Enroll in {{ course.title }} 
         </button>
+        <div>
+            <a href="{% url 'course_comments' course.id %}" class="btn btn-outline-danger">View/Post Comments</a>
+        </div>
     {% endif %}
 {% elif not user.is_authenticated %}
     <a href="{% url 'login' %}" class="btn btn-outline-primary">Login to Enroll</a>
