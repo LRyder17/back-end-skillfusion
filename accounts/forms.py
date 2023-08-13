@@ -1,6 +1,6 @@
 from django import forms 
 from django.forms import inlineformset_factory
-from .models import Comment, Profile, Course, CourseCategory, GroupStudyMeeting
+from .models import Comment, Profile, Course, CourseCategory, GroupStudyMeeting, Enrollment 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.validators import MaxLengthValidator
@@ -108,16 +108,6 @@ class CourseForm(forms.ModelForm):
 
 
 class GroupStudyForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super(GroupStudyForm, self).__init__(*args, **kwargs)
-        self.fields['course'].queryset = Course.objects.filter(students=user)
-
-        # Explicitly mark certain fields as not required
-        self.fields['meeting_type'].required = False
-        self.fields['location'].required = False
-        self.fields['meeting_link'].required = False
-        self.fields['description'].required = False
 
     class Meta:
         model = GroupStudyMeeting
@@ -125,28 +115,46 @@ class GroupStudyForm(forms.ModelForm):
                   'start_time_meridiem', 'end_time_meridiem', 'meeting_link', 'description']
         
         widgets = {
-            'meeting_type': forms.Select(),
-            'date': forms.DateInput(attrs={'placeholder': '*date (YYYY-MM-DD)'}),
-            'start_time': forms.TimeInput(attrs={'placeholder': '*start time (--:--)'}),
-            'end_time': forms.TimeInput(attrs={'placeholder': '*end time (--:--)'}),
-            'start_time_meridiem': forms.Select(),
-            'end_time_meridiem': forms.Select(),
-            'location': forms.TextInput(attrs={'placeholder': 'meeting location'}),
-            'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
+        'meeting_type': forms.Select(),
+        'date': forms.DateInput(attrs={'placeholder': '*date (YYYY-MM-DD)'}),
+        'start_time': forms.TimeInput(attrs={'placeholder': '*start time (--:--)'}),
+        'end_time': forms.TimeInput(attrs={'placeholder': '*end time (--:--)'}),
+        'start_time_meridiem': forms.Select(),
+        'end_time_meridiem': forms.Select(),
+        'location': forms.TextInput(attrs={'placeholder': 'meeting location'}),
+        'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
+        'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
         }
+
         labels = {
-            'course': '*Select Course',
-            'meeting_type': 'Select Meeting Type ',
-            'date': "Date: ",
-            'start_time': 'Start Time ',
-            'end_time': 'End Time',
-            'start_time_meridiem': '*AM/PM',
-            'end_time_meridiem': '*AM/PM',
-            'location': 'Meeting Location',
-            'meeting_link': 'Meeting Link',
-            'description': 'Meeting Description',
+        'course': '*Select Course',
+        'meeting_type': 'Select Meeting Type ',
+        'date': "Date: ",
+        'start_time': 'Start Time ',
+        'end_time': 'End Time',
+        'start_time_meridiem': '*AM/PM',
+        'end_time_meridiem': '*AM/PM',
+        'location': 'Meeting Location',
+        'meeting_link': 'Meeting Link',
+        'description': 'Meeting Description',
         }
+        
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(GroupStudyForm, self).__init__(*args, **kwargs)
+
+        if user:
+            enrollments = Enrollment.objects.filter(student=user)
+            enrolled_courses = [enrollment.course for enrollment in enrollments]
+            self.fields['course'].queryset = Course.objects.filter(id__in=[course.id for course in enrolled_courses])
+        
+        # Explicitly mark certain fields as not required
+        self.fields['meeting_type'].required = False
+        self.fields['location'].required = False
+        self.fields['meeting_link'].required = False
+        self.fields['description'].required = False
+
+    
 
 
 

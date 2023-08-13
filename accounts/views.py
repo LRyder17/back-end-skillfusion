@@ -194,20 +194,23 @@ def create_course(request):
 
 def group_study_request(request):
     if request.user.is_authenticated:
-        form = GroupStudyForm(user=request.user)  # default form for GET request
+        form = GroupStudyForm(user=request.user)  # Pass user to form for GET
         if request.method == 'POST':
-            form = GroupStudyForm(request.POST, user=request.user)
+            form = GroupStudyForm(request.POST, user=request.user)  # Pass user to form for POST
             if form.is_valid():
-                form.save()
-                messages.success(request,("You successfully created a group study meeting!"))
+                study_request = form.save(commit=False)  
+                study_request.created_by = request.user  
+                study_request.save() 
+                messages.success(request, "You successfully created a group study meeting!")
                 return redirect('course_list')
         
         # Return render for both GET and POST when form is not valid
         return render(request, 'group_study_meeting.html', {'form': form})
-    
     else:
         messages.error(request, ("You must be logged in to request a group study!"))
         return redirect('login')
+
+
 
 def my_study_requests(request):
     if request.user.is_authenticated:
@@ -216,6 +219,7 @@ def my_study_requests(request):
 
         # Filter study requests based on the enrolled courses
         study_requests = GroupStudyMeeting.objects.filter(course__in=enrolled_courses)
+            
         return render(request, 'my_study_requests.html', {'study_requests': study_requests})
     else:
         messages.success(request,("You must be logged in to view study requests!"))
