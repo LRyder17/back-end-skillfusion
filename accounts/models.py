@@ -124,6 +124,10 @@ class Enrollment(models.Model):
     class Meta:
         verbose_name_plural="Enrolled Courses"
     
+    def save(self, *args, **kwargs):
+        super(Enrollment, self).save(*args, **kwargs)
+        self.course.check_max_students()
+    
     def __str__(self):
         return f"{self.student} enrolled in {self.course}"
 
