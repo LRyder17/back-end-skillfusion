@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm, GroupStudyForm, StudyRequestForm
+from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm, GroupStudyForm
 from django.contrib.auth.models import User
 from django.utils import timezone
 import calendar
@@ -191,21 +191,6 @@ def create_course(request):
         messages.success(request, ("You must be logged in to add a course!"))
         return redirect('login')
     
-def create_study_request(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = StudyRequestForm(request.POST, user=request.user)
-            if form.is_valid():
-                study_request = form.save()
-                messages.success(request, ("You successfully created a study request!"))
-                return redirect('course_list')
-        else:
-            form = StudyRequestForm(user=request.user)
-        
-        return render(request, 'create_study_request.html', {'form': form})
-    else:
-        messages.success(request, ("You must be logged in to request a group study!"))
-        return redirect('login')
 
 def group_study_request(request):
     if request.user.is_authenticated:

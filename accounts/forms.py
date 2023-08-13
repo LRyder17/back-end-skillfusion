@@ -106,50 +106,7 @@ class CourseForm(forms.ModelForm):
             'open_enrollment': forms.CheckboxInput(),
         }
 
-class StudyRequestForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super(StudyRequestForm, self).__init__(*args, **kwargs)
 
-    class Meta:
-        model = GroupStudyMeeting
-        fields = ['course', 'meeting_type', 'date', 'start_time', 'end_time', 'location', 
-                    'start_time_meridiem', 'end_time_meridiem', 'meeting_link', 'description']
-        labels = {
-            'course': 'Course',
-            'meeting_type': 'Select Meeting Type ',
-            'date': "Date: ",
-            'start_time': 'Start Time ',
-            'end_time': 'End Time',
-            'start_time_meridiem': 'AM/PM',
-            'end_time_meridiem': 'AM/PM',
-            'location': 'Meeting Location',
-            'meeting_link': 'Meeting Link',
-            'description': 'Meeting Description',
-
-        }
-        widgets = {
-            'course': forms.Select(), 
-            'meeting_type': forms.Select(),
-            'date': forms.DateInput(attrs={'placeholder': 'Meeting date (MM/DD)'}),
-            'start_time': forms.TimeInput(attrs={'placeholder': 'start time (--:--)'}),
-            'end_time': forms.TimeInput(attrs={'placeholder': 'end time(--:--)'}),
-            'start_time_meridiem': forms.Select(),
-            'end_time_meridiem': forms.Select(),
-            'location': forms.TextInput(attrs={'placeholder': 'Enter meeting location'}),
-            'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
-        }
-        required = {
-            'meeting_type': False,
-            'date': True,
-            'start_time': True,
-            'end_time': False,
-            'location': False,
-            'meeting_link': False,
-            'description': False,
-        }
-    
 class GroupStudyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
