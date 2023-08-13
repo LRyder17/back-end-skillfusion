@@ -210,8 +210,6 @@ def group_study_request(request):
         messages.error(request, ("You must be logged in to request a group study!"))
         return redirect('login')
 
-
-
 def my_study_requests(request):
     if request.user.is_authenticated:
         enrollments = Enrollment.objects.filter(student=request.user)
@@ -225,10 +223,10 @@ def my_study_requests(request):
         messages.success(request,("You must be logged in to view study requests!"))
         return redirect('login')
     
-def update_study_request(request, id):
+def update_study_request(request, request_id):
     if request.user.is_authenticated:
-        study_request = get_object_or_404(GroupStudyMeeting, id=id)
-        # form = GroupStudyForm(user=request.user)  # default form for GET request
+        study_request = get_object_or_404(GroupStudyMeeting, id=request_id)
+        form = GroupStudyForm(user=request.user)  # default form for GET request
         if request.method == 'POST':
             form = GroupStudyForm(request.POST, instance=study_request, user=request.user)
             if form.is_valid():
