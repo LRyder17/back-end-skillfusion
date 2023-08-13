@@ -108,6 +108,7 @@ class GroupStudyMeeting(models.Model):
     ('PM', 'PM'),
     ]
     course = models.ForeignKey(Course, related_name='class_meeting_schedule', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     meeting_type = models.CharField(max_length=10, choices=MEETING_TYPES, default='ONLINE')
     date = models.DateField()
     start_time = models.TimeField()

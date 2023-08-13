@@ -220,6 +220,31 @@ def my_study_requests(request):
     else:
         messages.success(request,("You must be logged in to view study requests!"))
         return redirect('login')
+    
+def update_study_request(request, id):
+    if request.user.is_authenticated:
+        study_request = get_object_or_404(GroupStudyMeeting, id=id)
+        # form = GroupStudyForm(user=request.user)  # default form for GET request
+        if request.method == 'POST':
+            form = GroupStudyForm(request.POST, instance=study_request, user=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success (request,
+                            ("You successfully update the group study meeting request!"))
+                return redirect('course_list')
+        else:
+            form = GroupStudyForm(instance=study_request, user=request.user)
+        
+        context = {
+            'study_request': study_request,
+            'form': form,
+            'previous_page': request.META.get('HTTP_REFERER', None)     
+        }
+        return render(request, 'update_study_request.html', context)
+    
+    else:
+        messages.error(request, ("You must be logged in to update a group study request!"))
+        return redirect('login')
 
 
 def course_detail(request, pk):
