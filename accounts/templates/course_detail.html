@@ -11,15 +11,17 @@
             {% else %}
                 <img src="{% static 'images/generic_profile_pic2.png' %}" class="img-fluid rounded-start" alt="Profile Picture">
             {% endif %}
-        </div>
-        
+        </div> 
         <div class="col-6">
             <div class="card border-success mb-3" style="max-width: 35rem;">
                 <div class="card-header bg-transparent border-success">
                     <h5 class="card-title text-center">{{ course.title }}</h5>
                 </div>
                 <div class="card-body">
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <p class="card-text"><strong>Start Date: </strong> {{ course.start_date }}</p>
+                    <p class="card-text"><strong>Subject:</strong> {{ course.subject }}</p>
+                    <p class="card-text"><strong>Details:</strong> {{ course.description }}</p>
+                    <p class="card-text"><strong>Students Enrolled:</strong> {{ course.description }}</p>
                 </div>
                 {% if course.open_enrollment %}
                     <div class="card-footer bg-transparent border-success
