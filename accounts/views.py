@@ -7,7 +7,7 @@ from oauth2client.client import OAuth2Credentials
 # from googleapiclient.discovery import build
 # from google.oauth2 import service_account
 from django.views.decorators.csrf import csrf_exempt
-from .models import Profile, Comment, Course, Enrollment   
+from .models import Profile, Comment, Course, Enrollment, GroupStudyMeeting   
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
@@ -207,6 +207,18 @@ def group_study_request(request):
     
     else:
         messages.error(request, ("You must be logged in to request a group study!"))
+        return redirect('login')
+
+def my_study_requests(request):
+    if request.user.is_authenticated:
+        enrollments = Enrollment.objects.filter(student=request.user)
+        enrolled_courses = [enrollment.course for enrollment in enrollments]
+
+        # Filter study requests based on the enrolled courses
+        study_requests = GroupStudyMeeting.objects.filter(course__in=enrolled_courses)
+        return render(request, 'my_study_requests.html', {'study_requests': study_requests})
+    else:
+        messages.success(request,("You must be logged in to view study requests!"))
         return redirect('login')
 
 
