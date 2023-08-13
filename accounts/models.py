@@ -84,6 +84,16 @@ class Course(models.Model):
     class Meta:
         verbose_name_plural="Courses"
 
+    def check_max_students(self):
+        if self.max_students is not None:
+            student_count = self.enrolled_courses.count()
+            if student_count >= self.max_students:
+                self.open_enrollment = False
+                self.save()
+    
+    def has_study_request(self):
+        return GroupStudyMeeting.objects.filter(course=self).exists()
+
     def __str__(self):
         return self.title if self.title else 'No Title'
     
