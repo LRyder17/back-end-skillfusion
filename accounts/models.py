@@ -185,7 +185,9 @@ class Comment(models.Model):
 class StudyRequestAcceptance(models.Model):
     study_request = models.ForeignKey(GroupStudyMeeting, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='study_request_acceptances')  # added related_name
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, 
+                               related_name='study_request_acceptances', 
+                               null=True) 
     accepted = models.BooleanField(default=False)
 
     class Meta:

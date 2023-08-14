@@ -29,12 +29,13 @@
                         <p class="card-text"><strong>Meeting Type:</strong> {{study_request.meeting_type|title}}</p>
                         {% if study_request.created_by.username == request.user.username %}
                             <a href="{% url 'update_study_request' study_request.id %}">Modify</a>
-                        {% elif request.user in study_request.accepted_users.all %}
+                        {% elif study_request.id in accepted_study_request_ids %}
+                            <p class="card-text">Study Request Accepted</p>
                             <form method="post">
                                 {% csrf_token %}
                                 <input type="hidden" name="acceptance" value="cancel">
                                 <input type="hidden" name="study_request_id" value="{{ study_request.id }}">
-                                <button type="submit">Cancel Request</button>
+                                <button type="submit">Cancel</button>
                             </form>
                         {% else %}
                             <form method="post">

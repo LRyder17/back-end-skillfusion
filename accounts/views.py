@@ -210,22 +210,7 @@ def group_study_request(request):
         messages.error(request, ("You must be logged in to request a group study!"))
         return redirect('login')
 
-# def my_study_requests(request):
-#     if request.user.is_authenticated:
-#         enrollments = Enrollment.objects.filter(student=request.user)
-#         enrolled_courses = [enrollment.course for enrollment in enrollments]
 
-#         # Filter study requests based on the enrolled courses
-#         study_requests = GroupStudyMeeting.objects.filter(course__in=enrolled_courses)
-            
-#         return render(request, 'my_study_requests.html', {'study_requests': study_requests})
-#     else:
-#         messages.success(request,("You must be logged in to view study requests!"))
-#         return redirect('login')
-
-
-
-    
 def update_study_request(request, request_id):
     if request.user.is_authenticated:
         study_request = get_object_or_404(GroupStudyMeeting, id=request_id)
@@ -250,29 +235,32 @@ def update_study_request(request, request_id):
     else:
         messages.error(request, ("You must be logged in to update a group study request!"))
         return redirect('login')
-    
+
+
 def my_study_requests(request):
     if request.user.is_authenticated:
-        enrollments = Enrollment.objects.filter(student=request.user)
-        enrolled_courses = [enrollment.course for enrollment in enrollments]
+        enrolled_courses = Course.objects.filter(enrolled_courses__student=request.user)
 
-        # Filter study requests based on the enrolled courses
         study_requests = GroupStudyMeeting.objects.filter(course__in=enrolled_courses)
 
-        # Acceptance logic
+        accepted_study_request_ids = StudyRequestAcceptance.objects.filter(user=request.user, 
+                                                                           study_request__in=study_requests,
+                                                                           accepted=True).values_list('study_request__id', flat=True)
+
         if request.method == "POST":
             action = request.POST.get('acceptance')
             study_request_id = request.POST.get("study_request_id")
             study_request = get_object_or_404(GroupStudyMeeting, id=study_request_id)
 
             if action == "cancel":
-                # Cancel the acceptance of the study request
                 StudyRequestAcceptance.objects.filter(study_request=study_request, user=request.user).delete()
             elif action == "accept":
-                # Accept the study request
                 StudyRequestAcceptance.objects.create(study_request=study_request, user=request.user, accepted=True)
 
-        return render(request, 'my_study_requests.html', {'study_requests': study_requests})
+        return render(request, 'my_study_requests.html', {
+            'study_requests': study_requests,
+            'accepted_study_request_ids': accepted_study_request_ids,
+            })
     else:
         messages.success(request,("You must be logged in to view study requests!"))
         return redirect('login')
@@ -286,11 +274,9 @@ def course_detail(request, pk):
         if request.method == "POST":
             action = request.POST.get('enrollment')
             if action == "unenroll":
-                # Unenroll the user from the course
                 Enrollment.objects.filter(course=course, student=request.user).delete()
                 course.students.remove(request.user)
             elif action == "enroll":
-                # Enroll the user in the course
                 Enrollment.objects.create(course=course, student=request.user, enrolled_time=timezone.now())
                 course.students.add(request.user)
             course.save()
