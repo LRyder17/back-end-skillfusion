@@ -24,11 +24,25 @@
                         {% endif %}
                     </div>
                     <div class="col-4">
-                        <p class="card-text">Date: {{study_request.date }}</p>
-                        <p class="card-text">Time: {{study_request.start_time }} - {{study_request.end_time }}</p>
-                        <p class="card-text">Meeting Type: {{study_request.meeting_type|title}}</p>
+                        <p class="card-text"><strong>Date:</strong> {{study_request.date }}</p>
+                        <p class="card-text"><strong>Time: </strong> {{study_request.start_time }} - {{study_request.end_time }}</p>
+                        <p class="card-text"><strong>Meeting Type:</strong> {{study_request.meeting_type|title}}</p>
                         {% if study_request.created_by.username == request.user.username %}
                             <a href="{% url 'update_study_request' study_request.id %}">Modify</a>
+                        {% elif request.user in study_request.accepted_users.all %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="acceptance" value="cancel">
+                                <input type="hidden" name="study_request_id" value="{{ study_request.id }}">
+                                <button type="submit">Cancel Request</button>
+                            </form>
+                        {% else %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="acceptance" value="accept">
+                                <input type="hidden" name="study_request_id" value="{{ study_request.id }}">
+                                <button type="submit">Accept Request</button>
+                            </form>
                         {% endif %}
                     </div>
                 </div>
@@ -36,5 +50,6 @@
         </div>
         <br/>
 {% endfor %}
+
 
 {% endblock content %}

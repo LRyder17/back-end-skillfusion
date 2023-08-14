@@ -119,6 +119,21 @@ class GroupStudyMeeting(models.Model):
     meeting_link = models.URLField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
+    # def accepted_users(self):
+    #     return StudyRequestAcceptance.objects.filter(study_request=self, accepted=True).values_list('user__id', flat=True)
+
+    def accepted_users_names(self):
+        accepted_users = StudyRequestAcceptance.objects.filter(study_request=self, accepted=True)
+        return ", ".join([acceptance.user.username for acceptance in accepted_users])
+
+    @property
+    def is_accepted(self):
+        return StudyRequestAcceptance.objects.filter(study_request=self, accepted=True).exists()
+
+    @property
+    def accepted_count(self):
+        return StudyRequestAcceptance.objects.filter(study_request=self, accepted=True).count()
+
     class Meta:
         verbose_name = "Group Meeting"
         verbose_name_plural = "Group Meetings"
@@ -167,3 +182,20 @@ class Comment(models.Model):
             f"{self.body}..."
         )
 
+class StudyRequestAcceptance(models.Model):
+    study_request = models.ForeignKey(GroupStudyMeeting, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='study_request_acceptances')  # added related_name
+    accepted = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural="Study Request Acceptances"
+        unique_together = ('study_request', 'user')
+    
+    def __str__(self):
+        return f"{self.user.username} accepted study request for {self.study_request.course.title}"
+
+    def save(self, *args, **kwargs):
+        if not self.course:
+            self.course = self.study_request.course
+        super(StudyRequestAcceptance, self).save(*args, **kwargs)
