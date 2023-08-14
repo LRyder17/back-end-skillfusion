@@ -78,17 +78,26 @@ class Course(models.Model):
 
     course_image = models.ImageField(null=True, blank=True, upload_to="images/")
     start_date = models.DateField(null=True, blank=True)
-    category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, null=True, blank=True)
+    category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, 
+                                                null=True, 
+                                                blank=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=200)
     subject = models.CharField(max_length=200)
     description = models.TextField(default="")
-    level_of_difficulty = models.CharField(null=True, blank=True, max_length=1, choices=LEVEL_CHOICES)
-    duration_in_weeks = models.PositiveIntegerField(null=True, blank=True, help_text="Enter length of the course in weeks.")
-    class_frequency = models.PositiveIntegerField(null=True, blank=True, help_text="Enter how often the class will meet per week.")
-    max_students = models.PositiveIntegerField(null=True, blank=True, help_text="Enter maximum number of students. Leave blank for open enrollment.")
+    level_of_difficulty = models.CharField(null=True, blank=True, 
+                                           max_length=1, choices=LEVEL_CHOICES)
+    duration_in_weeks = models.PositiveIntegerField(
+                                                    null=True, blank=True, 
+                                                    help_text="Enter length of the course in weeks.")
+    class_frequency = models.PositiveIntegerField(
+                                                null=True, blank=True, 
+                                                help_text="Enter how often the class will meet per week.")
+    max_students = models.PositiveIntegerField(
+                                            null=True, blank=True, 
+                                            help_text="Enter maximum number of students. Leave blank for open enrollment.")
     open_enrollment = models.BooleanField(default=True)
 
     class Meta:
@@ -123,7 +132,8 @@ class GroupStudyMeeting(models.Model):
     ('AM', 'AM'),
     ('PM', 'PM'),
     ]
-    course = models.ForeignKey(Course, related_name='class_meeting_schedule', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, related_name='class_meeting_schedule', 
+                                        on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     meeting_type = models.CharField(max_length=10, choices=MEETING_TYPES, default='ONLINE')
     date = models.DateField()
@@ -136,16 +146,21 @@ class GroupStudyMeeting(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def accepted_users_names(self):
-        accepted_users = StudyRequestAcceptance.objects.filter(study_request=self, accepted=True)
+        accepted_users = StudyRequestAcceptance.objects.filter(study_request=self, 
+                                                               accepted=True)
         return ", ".join([acceptance.user.username for acceptance in accepted_users])
 
     @property
     def is_accepted(self):
-        return StudyRequestAcceptance.objects.filter(study_request=self, accepted=True).exists()
+        return StudyRequestAcceptance.objects.filter(study_request=self, 
+                                                     accepted=True).exists()
 
     @property
     def accepted_count(self):
-        return 1 + StudyRequestAcceptance.objects.filter(study_request=self, accepted=True).exclude(user=self.created_by).count()
+        return 1 + StudyRequestAcceptance.objects.filter(
+                                            study_request=self, 
+                                            accepted=True).exclude(
+                                            user=self.created_by).count()
     
     class Meta:
         verbose_name = "Group Meeting"
@@ -156,8 +171,10 @@ class GroupStudyMeeting(models.Model):
 
 
 class Enrollment(models.Model):
-    course=models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrolled_courses')
-    student=models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrolled_students')
+    course=models.ForeignKey(Course, on_delete=models.CASCADE, 
+                             related_name='enrolled_courses')
+    student=models.ForeignKey(User, on_delete=models.CASCADE, 
+                              related_name='enrolled_students')
     enrolled_time=models.DateTimeField(auto_now_add=True)
 
     class Meta:

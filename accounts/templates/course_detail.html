@@ -5,9 +5,47 @@
 <div class="container">
     <h1>Course Details</h1>
     <div class="row">
+        <div class="d-grid gap-2 col-12 mx-auto">
+            {% if user in course.likes.all %}   
+                <a href="{% url 'course_like' course.id %}">
+                    <button class="btn btn-info"
+                    type="button">Liked</button>
+                </a>
+            {% else %}
+                <a href="{% url 'course_like' course.id %}">
+                    <button class="btn btn-outline-info"
+                    type="button">Like</button>
+                </a>
+            {% endif %}
+            <div class="col-8">
+                {% if course.number_of_likes == 1 %}
+                    1 Like
+                {% elif course.number_of_likes > 1 %}
+                    {{course.number_of_likes}} Likes
+                {% endif %}
+            </div>
+            {% if user in course.favorites.all %}
+                <a href="{% url 'course_favorite' course.id %}">
+                    <button class="btn btn-warning" style="text-decoration: none;"
+                    type="button">Favorited</button>
+                </a>
+            {% else %}
+                <a href="{% url 'course_favorite' course.id %}">
+                    <button class="btn btn-outline-warning" style="text-decoration: none;"
+                    type="button">Favorite</button>
+                </a>
+            {% endif %}
+            <div class="col-8">
+                {% if course.number_of_favorites == 1 %}
+                    1 Favorite
+                {% elif course.number_of_favorites > 1 %}
+                    {{course.number_of_favorites}} Favorites
+                {% endif %}
+            </div>
+        </div>
     </div>
         <br/>
-        <br/>
+        <br/>    
     <div class="row">
         <div class="card" style="width: 30rem;">
             {% if course.course_image %}
@@ -27,7 +65,8 @@
                     <p class="card-text"><strong>Start Date: </strong> {{ course.start_date }}</p>
                     <p class="card-text"><strong>Subject:</strong> {{ course.subject }}</p>
                     <p class="card-text"><strong>Details:</strong> {{ course.description }}</p>
-                    <p class="card-text"><strong>Number of Students Enrolled:</strong> {{ enrolled_students_count }}</p>
+                    <p class="card-text"><strong>Number of Students Enrolled:</strong> 
+                        {{ enrolled_students_count }}</p>
                 </div>
                 {% if course.open_enrollment %}
                     <div class="card-footer bg-transparent border-success
@@ -46,49 +85,56 @@
 </div>
 <div class="row">
     <div class="col-3">
-        <form method="POST">
+        <form method="POST" action="{% url 'course_enrollment' course.pk %}">
             {% csrf_token %}
             {% if user.is_authenticated and user != course.creator %}
                 {% if course in user.enrolled_courses.all %}
                     <div>
-                        <button 
+                        {% comment %} <button 
                             class="btn btn-outline-danger" 
                             name="enrollment"
                             value="unenroll" 
                             type="submit">Unenroll from {{ course.title }} 
-                        </button>
+                        </button> {% endcomment %}
+                        <button type="submit" name="enrollment" value="unenroll">Unenroll</button>
                     </div>
                     <br/>
                     <div>
-                        <a href="{% url 'course_comments' course.id %}" class="btn btn-outline-secondary">View/Post Comments</a>
+                        <a href="{% url 'course_comments' course.id %}" 
+                        class="btn btn-outline-secondary">View/Post Comments</a>
                     </div>
                 {% else %}
                     <div>
-                        <button 
+                        {% comment %} <button 
                             class="btn btn-outline-success" 
                             name="enrollment"
                             value="enroll" 
                             type="submit">Enroll in {{ course.title }} 
-                        </button>
+                        </button> {% endcomment %}
+                        <button type="submit" name="enrollment" value="enroll">Enroll</button>
                     </div>
                     <br/>
                     <div>
-                        <a href="{% url 'course_comments' course.id %}" class="btn btn-outline-secondary">View/Post Comments</a>
+                        <a href="{% url 'course_comments' course.id %}" 
+                        class="btn btn-outline-secondary">View/Post Comments</a>
                     </div>
                 {% endif %}
             {% elif user.enrolled_courses.all and user == course.creator %}
                 <td align="right">
                     <div>
-                        <a href="{% url 'update_course' course.id %}" class="btn btn-outline-secondary"> Update Course </a>
+                        <a href="{% url 'update_course' course.id %}" 
+                        class="btn btn-outline-secondary"> Update Course </a>
                     </div>
                     <br/>
                     <div>
-                        <a href="{% url 'delete_course' course.id %}" class="btn btn-outline-danger">Delete Course</a>
+                        <a href="{% url 'delete_course' course.id %}" 
+                        class="btn btn-outline-danger">Delete Course</a>
                     </div>
                 </td>
             {% elif not user.is_authenticated %}
                 <div>
-                    <a href="{% url 'login' %}" class="btn btn-outline-primary">Login to Enroll</a>
+                    <a href="{% url 'login' %}" 
+                    class="btn btn-outline-primary">Login to Enroll</a>
                 </div>
             {% endif %}
         </form>

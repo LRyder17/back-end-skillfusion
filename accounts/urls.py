@@ -21,6 +21,9 @@ urlpatterns = [
 
     # Course Related Views
     path('courses/', views.course_list, name='course_list'),
+    path('course_enrollment/<int:pk>', views.course_enrollment, name='course_enrollment'),
+    path('course_like/<int:pk>/', views.course_like, name='course_like'),
+    path('course_favorite/<int:pk>/', views.course_favorite, name='course_favorite'),
     path('courses/<int:pk>/', views.course_detail, name='course_detail'),
     path('courses/<int:pk>/comments', views.course_comments, name='course_comments'),
     path('courses/subject/<str:subject>/', views.courses_by_subject, name='courses_by_subject'),
