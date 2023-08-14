@@ -122,6 +122,26 @@ def comment_like(request, pk):
             comment.likes.add(request.user)
     
         return redirect(request.META.get("HTTP_REFERER"))
+    
+# def course_like(request, pk):
+#     if request.user.is_authenticated:
+#         course = get_object_or_404(Comment, id=pk)
+#         if course.likes.filter(id=request.user.id):
+#             course.likes.remove(request.user)
+#         else:
+#             course.likes.add(request.user)
+    
+#         return redirect(request.META.get("HTTP_REFERER"))
+
+# def course_favorites(request, pk):
+#     if request.user.is_authenticated:
+#         course = get_object_or_404(Comment, id=pk)
+#         if course.favorites.filter(id=request.user.id):
+#             course.favorites.remove(request.user)
+#         else:
+#             course.favorites.add(request.user)
+    
+#         return redirect(request.META.get("HTTP_REFERER"))
 
 def comment_show(request, pk):
     comment = get_object_or_404(Comment, id=pk)

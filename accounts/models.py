@@ -58,6 +58,24 @@ class Course(models.Model):
         ('A', 'Advanced'),
     ]
 
+    teacher = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="teaching_courses",
+        null=True, blank=True
+    )
+    students = models.ManyToManyField(
+        User, related_name="enrolled_courses",
+        blank=True
+    )
+    likes = models.ManyToManyField(
+        User, related_name="liked_courses",
+        blank=True
+    )
+    
+    favorites = models.ManyToManyField(
+        User, related_name="favorited_courses",
+        blank=True
+    )
+
     course_image = models.ImageField(null=True, blank=True, upload_to="images/")
     start_date = models.DateField(null=True, blank=True)
     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, null=True, blank=True)
@@ -72,17 +90,15 @@ class Course(models.Model):
     class_frequency = models.PositiveIntegerField(null=True, blank=True, help_text="Enter how often the class will meet per week.")
     max_students = models.PositiveIntegerField(null=True, blank=True, help_text="Enter maximum number of students. Leave blank for open enrollment.")
     open_enrollment = models.BooleanField(default=True)
-    teacher = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name="teaching_courses",
-        null=True, blank=True
-    )
-    students = models.ManyToManyField(
-        User, related_name="enrolled_courses",
-        blank=True
-    )
 
     class Meta:
         verbose_name_plural="Courses"
+
+    def number_of_likes(self):
+        return self.likes.count()
+    
+    def number_of_favorites(self):
+        return self.favorites.count()
 
     def check_max_students(self):
         if self.max_students is not None:
