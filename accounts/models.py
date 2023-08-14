@@ -119,9 +119,6 @@ class GroupStudyMeeting(models.Model):
     meeting_link = models.URLField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
-    # def accepted_users(self):
-    #     return StudyRequestAcceptance.objects.filter(study_request=self, accepted=True).values_list('user__id', flat=True)
-
     def accepted_users_names(self):
         accepted_users = StudyRequestAcceptance.objects.filter(study_request=self, accepted=True)
         return ", ".join([acceptance.user.username for acceptance in accepted_users])
@@ -132,8 +129,8 @@ class GroupStudyMeeting(models.Model):
 
     @property
     def accepted_count(self):
-        return StudyRequestAcceptance.objects.filter(study_request=self, accepted=True).count()
-
+        return 1 + StudyRequestAcceptance.objects.filter(study_request=self, accepted=True).exclude(user=self.created_by).count()
+    
     class Meta:
         verbose_name = "Group Meeting"
         verbose_name_plural = "Group Meetings"

@@ -27,6 +27,7 @@
                         <p class="card-text"><strong>Date:</strong> {{study_request.date }}</p>
                         <p class="card-text"><strong>Time: </strong> {{study_request.start_time }} - {{study_request.end_time }}</p>
                         <p class="card-text"><strong>Meeting Type:</strong> {{study_request.meeting_type|title}}</p>
+                        <p class="card-text"><strong>Students Attending:</strong> {{ study_request.accepted_count }} </p>
                         {% if study_request.created_by.username == request.user.username %}
                             <a href="{% url 'update_study_request' study_request.id %}">Modify</a>
                         {% elif study_request.id in accepted_study_request_ids %}
