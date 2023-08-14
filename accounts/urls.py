@@ -38,6 +38,7 @@ urlpatterns = [
     path('create_study_request/', views.group_study_request, name='group_study_request'),
     path('my_study_requests/', views.my_study_requests, name='my_study_requests'),
     path('update_study_request/<int:request_id>/', views.update_study_request, name='update_study_request'),
+    path('delete_study_request/<int:request_id>', views.delete_study_request, name='delete_study_request'),
 
     # Calendar Views
     path('calendar/', views.calendar_view, name='calendar_view'),

@@ -52,13 +52,29 @@
         {{ form.description }}
     </div> 
     <div class="row">
-    <div class="col-3">
-      <button type="submit" class="btn btn-outline-secondary">Update Request</button>
-    </div>
-    <div class="col-3">
-        <a href="{{ previous_page }}" class="btn btn-outline-danger">Cancel</a>
-    </div>
+        <div class="col-3">
+        <button type="submit" class="btn btn-outline-secondary">Update Request</button>
+        </div>
+        <div class="col-3">
+            <a href="{{ previous_page }}" class="btn btn-outline-danger">Cancel</a>
+        </div>
+        <div class="col-3"></div>
     </div>
   </form>
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="col-3"></div>
+    <div class="col-3"></div>
+    <div class="col-3">
+        <form method="POST" action="{% url 'delete_study_request' study_request.pk %}">
+            {% csrf_token %}  
+            <button type="submit" class="btn btn-outline-danger">Delete Request</button>
+        </form>
+    </div>
 </div>
+<div class="row">
+    <br/><br/>
+</div>
+</div>
+
 {% endblock %}

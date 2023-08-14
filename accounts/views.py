@@ -255,7 +255,6 @@ def course_detail(request, pk):
     
 def course_enrollment(request, pk):
     if not request.user.is_authenticated:
-        # If user is not authenticated, redirect them to login page or any appropriate page.
         return redirect('name_of_login_page')
 
     course = get_object_or_404(Course, pk=pk)
@@ -274,10 +273,8 @@ def course_enrollment(request, pk):
 
         course.save()
 
-    # After the enrollment action is done, redirect back to the course detail page
     return redirect('course_detail', pk=pk)
 
-    
 def course_list(request):
     course_list = Course.objects.all()
     return render(request, 'course_list.html', {'course_list': course_list})
@@ -407,7 +404,22 @@ def update_study_request(request, request_id):
         messages.error(request, ("You must be logged in to update a group study request!"))
         return redirect('login')
 
-# def delete_study_request(request, request_id):
+def delete_study_request(request, request_id):
+    if request.user.is_authenticated:
+        study_request = get_object_or_404(GroupStudyMeeting, id=request_id)
+        if request.user == study_request.created_by:
+            study_request.delete()
+            messages.success(request, "You successfully deleted the study request.")
+            return redirect('my_study_requests')
+        else:
+            if request.user != study_request.created_by:
+                messages.success(request, "You do not have permission to delete this item")
+            else:
+                messages.success(request, "That Item Does Not Exist")
+            return redirect('home')
+    else:
+        messages.success(request, ("Please log in to continue."))
+        return redirect(request.META.get('login'))
 
 
 def oauth2callback(request):
