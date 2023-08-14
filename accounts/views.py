@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.db.models import Q
 from django.contrib import messages
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
@@ -282,17 +283,22 @@ def course_enrollment(request, pk):
 def search_courses(request):
     if request.method == "POST":
         searched = request.POST['searched']
-        # Redirect to the course_list view with the searched query parameter
         return redirect('course_list_searched', searched=searched)
     else:
         return render(request, 'search_courses.html', {})
 
 def course_list(request, searched=None):
     if searched:
-        course_list = Course.objects.filter(title__icontains=searched) 
+        course_list = Course.objects.filter(
+            Q(title__icontains=searched) | 
+            Q(category__title__icontains=searched) | 
+            Q(subject__icontains=searched) |
+            Q(teacher__username__icontains=searched) |
+            Q(level_of_difficulty__icontains=searched)
+    )
     else:
         course_list = Course.objects.all()
-    return render(request, 'course_list.html', {'course_list': course_list})
+    return render(request, 'course_list.html', {'course_list': course_list, 'searched': searched})
 
 def courses_by_subject(request, subject):
     course_list = Course.objects.filter(subject=subject)

@@ -90,13 +90,11 @@
             {% if user.is_authenticated and user != course.creator %}
                 {% if course in user.enrolled_courses.all %}
                     <div>
-                        {% comment %} <button 
-                            class="btn btn-outline-danger" 
-                            name="enrollment"
-                            value="unenroll" 
-                            type="submit">Unenroll from {{ course.title }} 
-                        </button> {% endcomment %}
-                        <button type="submit" name="enrollment" value="unenroll">Unenroll</button>
+                        <button type="submit"
+                                class="btn btn-outline-danger" 
+                                name="enrollment" 
+                                value="unenroll">Unenroll
+                        </button>
                     </div>
                     <br/>
                     <div>
@@ -105,13 +103,12 @@
                     </div>
                 {% else %}
                     <div>
-                        {% comment %} <button 
+                        <button 
+                            type="submit"
                             class="btn btn-outline-success" 
-                            name="enrollment"
-                            value="enroll" 
-                            type="submit">Enroll in {{ course.title }} 
-                        </button> {% endcomment %}
-                        <button type="submit" name="enrollment" value="enroll">Enroll</button>
+                            name="enrollment" 
+                            value="enroll">Enroll
+                        </button>
                     </div>
                     <br/>
                     <div>
@@ -140,4 +137,5 @@
         </form>
     </div>
 </div>
+<br/><br/>
 {% endblock %}
