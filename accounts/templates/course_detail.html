@@ -5,13 +5,19 @@
 <div class="container">
     <h1>Course Details</h1>
     <div class="row">
-        <div class="col-6">
+    </div>
+        <br/>
+        <br/>
+    <div class="row">
+        <div class="card" style="width: 30rem;">
             {% if course.course_image %}
-                <img src="{{ course.course_image.url }}" class="d-block w-100" alt="">
+                <img src="{{ course.course_image.url }}" class="card-img-top" alt="">
             {% else %}
                 <img src="{% static 'images/generic_profile_pic2.png' %}" class="img-fluid rounded-start" alt="Profile Picture">
             {% endif %}
         </div> 
+        <div class="col-1">
+        </div>
         <div class="col-6">
             <div class="card border-success mb-3" style="max-width: 35rem;">
                 <div class="card-header bg-transparent border-success">
@@ -34,7 +40,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="row">
     <br/>
