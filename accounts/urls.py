@@ -32,6 +32,7 @@ urlpatterns = [
     path('update_course/<course_id>/', views.update_course, name='update_course'),
     path('delete_course/<int:pk>/', views.delete_course, name='delete_course'),
     path('search_courses/', views.search_courses, name='search_courses'),
+    path('courses/<str:searched>/', views.course_list, name='course_list_searched'),
     path('my_courses/', views.my_courses, name='my_courses'),
 
     # Study Request Views

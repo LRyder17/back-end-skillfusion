@@ -275,8 +275,23 @@ def course_enrollment(request, pk):
 
     return redirect('course_detail', pk=pk)
 
-def course_list(request):
-    course_list = Course.objects.all()
+# def course_list(request):
+#     course_list = Course.objects.all()
+#     return render(request, 'course_list.html', {'course_list': course_list})
+
+def search_courses(request):
+    if request.method == "POST":
+        searched = request.POST['searched']
+        # Redirect to the course_list view with the searched query parameter
+        return redirect('course_list_searched', searched=searched)
+    else:
+        return render(request, 'search_courses.html', {})
+
+def course_list(request, searched=None):
+    if searched:
+        course_list = Course.objects.filter(title__icontains=searched) 
+    else:
+        course_list = Course.objects.all()
     return render(request, 'course_list.html', {'course_list': course_list})
 
 def courses_by_subject(request, subject):
@@ -304,14 +319,15 @@ def update_course(request, course_id):
         return redirect('course_list')
     return render(request, 'update_course.html', {'course': course, 'form': form})
 
-def search_courses(request):
-    if request.method == "POST":
-        searched = request.POST['searched']
-        courses = Course.objects.filter(title__contains=searched)
-        return render(request, 'search_courses.html', {'searched': searched,
-                                                       'courses': courses})
-    else:
-        return render(request, 'search_courses.html', {})
+# def search_courses(request):
+#     if request.method == "POST":
+#         searched = request.POST['searched']
+#         courses = Course.objects.filter(title__contains=searched)
+#         return render(request, 'search_courses.html', {'searched': searched,
+#                                                        'courses': courses})
+#     else:
+#         return render(request, 'search_courses.html', {})
+
 
 def delete_course(request, pk):
     if request.user.is_authenticated:
