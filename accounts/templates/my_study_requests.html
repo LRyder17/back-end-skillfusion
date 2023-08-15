@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h1>Study Requests</h1>
+<br/>
+{% for study_request in study_requests %}
+        <div class="card">
+            <div class="card-header">
+            <h5> Course {{study_request.course.title }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3">
+                        {% if study_request.course.course_image %}
+                            <a href="{% url 'course_detail' study_request.course.id %}">
+                                <img src="{{ study_request.course.course_image.url }}" width=200
+                                height=200 class="img-fluid rounded-start" alt=""></a>
+                        {% else %}
+                            <a href="{% url 'course_detail' study_request.course.id %}">
+                                <img src="{% static 'images/skillfusion.png' %}" 
+                                class="img-fluid rounded-start" 
+                                alt=""></a>
+                        {% endif %}
+                    </div>
+                    <div class="col-4">
+                        <p class="card-text"><strong>Date:</strong> {{study_request.date }}</p>
+                        <p class="card-text"><strong>Time: </strong> {{study_request.start_time }} - {{study_request.end_time }}</p>
+                        <p class="card-text"><strong>Meeting Type:</strong> {{study_request.meeting_type|title}}</p>
+                        <p class="card-text"><strong>Students Attending:</strong> {{ study_request.accepted_count }} </p>
+                        {% if study_request.created_by.username == request.user.username %}
+                            <a href="{% url 'update_study_request' study_request.id %}">Modify</a>
+                        {% elif study_request.id in accepted_study_request_ids %}
+                            <p class="card-text">Study Request Accepted</p>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="acceptance" value="cancel">
+                                <input type="hidden" name="study_request_id" value="{{ study_request.id }}">
+                                <button type="submit">Cancel</button>
+                            </form>
+                        {% else %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="acceptance" value="accept">
+                                <input type="hidden" name="study_request_id" value="{{ study_request.id }}">
+                                <button type="submit">Accept Request</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/>
+{% endfor %}
+
+
+{% endblock content %}

@@ -1,6 +1,6 @@
 from django import forms 
 from django.forms import inlineformset_factory
-from .models import Comment, Profile, Course, CourseCategory, GroupStudyMeeting
+from .models import Comment, Profile, Course, CourseCategory, GroupStudyMeeting, Enrollment 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.validators import MaxLengthValidator
@@ -50,22 +50,22 @@ class UserRegistrationForm(UserCreationForm):
 
 class ProfileForm(forms.ModelForm):
     profile_image = forms.ImageField(label="Profile Picture")
-    about_me = forms.CharField(
-        widget=forms.Textarea, 
-        validators=[MaxLengthValidator(500)])
-    interests = forms.ModelMultipleChoiceField(
+    about_me = forms.CharField(widget=forms.Textarea, validators=[MaxLengthValidator(500)])
+    interested_categories = forms.ModelMultipleChoiceField(
         queryset=CourseCategory.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
         required=False,
         label="Areas of Interest"
     )
+    instagram_link = forms.CharField(label="", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Instagram Link'}))
 
     class Meta:
         model = Profile
-        fields = ('profile_image', 'about_me', 'interests')
+        fields = ('profile_image', 'about_me', 'instagram_link', 'interested_categories')
 
 class CourseForm(forms.ModelForm):
     course_image = forms.ImageField(label="Course Image", required=False)
+    # teacher = forms.ModelChoiceField(queryset=User.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-select'}))
     category = forms.ModelChoiceField(queryset=CourseCategory.objects.all(), 
                                       required=False, 
                                       widget=forms.Select(attrs={'class': 'form-select'}))
@@ -83,11 +83,11 @@ class CourseForm(forms.ModelForm):
     
     class Meta:
         model = Course
-        fields = ['course_image', 'title', 'course_start_date', 'subject', 'teacher', 'description', 'category', 'level_of_difficulty',
+        fields = ['course_image','start_date','title', 'subject', 'teacher', 'description', 'category', 'level_of_difficulty',
                   'duration_in_weeks', 'class_frequency', 'max_students', 'open_enrollment']
         labels = {
             'title': '',
-            'course_start_date': 'Start Date',
+            'start_date': 'Start Date',
             'subject': '',
             'teacher': 'Select a Teacher',
             'description': '',
@@ -100,6 +100,7 @@ class CourseForm(forms.ModelForm):
         }
         widgets = {
             'course_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'start_date': forms.DateInput(attrs={'placeholder': 'YYYY-MM-DD'}),
             'title': forms.TextInput(attrs={'placeholder': '*Enter title of course', 'required': True}),
             'course_start_date': forms.DateInput(attrs={'placeholder': '*date (YYYY-MM-DD)'}),
             'subject': forms.TextInput(attrs={'placeholder': '*Enter course subject', 'required': True}),
@@ -112,61 +113,8 @@ class CourseForm(forms.ModelForm):
             'open_enrollment': forms.CheckboxInput(),
         }
 
-class StudyRequestForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super(StudyRequestForm, self).__init__(*args, **kwargs)
 
-    class Meta:
-        model = GroupStudyMeeting
-        fields = ['course', 'meeting_type', 'date', 'start_time', 'end_time', 'location', 
-                    'start_time_meridiem', 'end_time_meridiem', 'meeting_link', 'description']
-        labels = {
-            'course': 'Course',
-            'meeting_type': 'Select Meeting Type ',
-            'date': "Date: ",
-            'start_time': 'Start Time ',
-            'end_time': 'End Time',
-            'start_time_meridiem': 'AM/PM',
-            'end_time_meridiem': 'AM/PM',
-            'location': 'Meeting Location',
-            'meeting_link': 'Meeting Link',
-            'description': 'Meeting Description',
-
-        }
-        widgets = {
-            'course': forms.Select(), 
-            'meeting_type': forms.Select(),
-            'date': forms.DateInput(attrs={'placeholder': 'Meeting date (MM/DD)'}),
-            'start_time': forms.TimeInput(attrs={'placeholder': 'start time (--:--)'}),
-            'end_time': forms.TimeInput(attrs={'placeholder': 'end time(--:--)'}),
-            'start_time_meridiem': forms.Select(),
-            'end_time_meridiem': forms.Select(),
-            'location': forms.TextInput(attrs={'placeholder': 'Enter meeting location'}),
-            'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
-        }
-        required = {
-            'meeting_type': False,
-            'date': True,
-            'start_time': True,
-            'end_time': False,
-            'location': False,
-            'meeting_link': False,
-            'description': False,
-        }
-    
 class GroupStudyForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super(GroupStudyForm, self).__init__(*args, **kwargs)
-        self.fields['course'].queryset = Course.objects.filter(students=user)
-
-        # Explicitly mark certain fields as not required
-        self.fields['meeting_type'].required = False
-        self.fields['location'].required = False
-        self.fields['meeting_link'].required = False
-        self.fields['description'].required = False
 
     class Meta:
         model = GroupStudyMeeting
@@ -174,28 +122,46 @@ class GroupStudyForm(forms.ModelForm):
                   'start_time_meridiem', 'end_time_meridiem', 'meeting_link', 'description']
         
         widgets = {
-            'meeting_type': forms.Select(),
-            'date': forms.DateInput(attrs={'placeholder': '*date (YYYY-MM-DD)'}),
-            'start_time': forms.TimeInput(attrs={'placeholder': '*start time (--:--)'}),
-            'end_time': forms.TimeInput(attrs={'placeholder': '*end time (--:--)'}),
-            'start_time_meridiem': forms.Select(),
-            'end_time_meridiem': forms.Select(),
-            'location': forms.TextInput(attrs={'placeholder': 'meeting location'}),
-            'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
+        'meeting_type': forms.Select(),
+        'date': forms.DateInput(attrs={'placeholder': '*date (YYYY-MM-DD)'}),
+        'start_time': forms.TimeInput(attrs={'placeholder': '*start time (--:--)'}),
+        'end_time': forms.TimeInput(attrs={'placeholder': '*end time (--:--)'}),
+        'start_time_meridiem': forms.Select(),
+        'end_time_meridiem': forms.Select(),
+        'location': forms.TextInput(attrs={'placeholder': 'meeting location'}),
+        'meeting_link': forms.URLInput(attrs={'placeholder': 'Enter meeting link'}),
+        'description': forms.Textarea(attrs={'placeholder': 'Enter meeting description'}),
         }
+
         labels = {
-            'course': '*Select Course',
-            'meeting_type': 'Select Meeting Type ',
-            'date': "Date: ",
-            'start_time': 'Start Time ',
-            'end_time': 'End Time',
-            'start_time_meridiem': '*AM/PM',
-            'end_time_meridiem': '*AM/PM',
-            'location': 'Meeting Location',
-            'meeting_link': 'Meeting Link',
-            'description': 'Meeting Description',
+        'course': '*Select Course',
+        'meeting_type': 'Select Meeting Type ',
+        'date': "Date: ",
+        'start_time': 'Start Time ',
+        'end_time': 'End Time',
+        'start_time_meridiem': '*AM/PM',
+        'end_time_meridiem': '*AM/PM',
+        'location': 'Meeting Location',
+        'meeting_link': 'Meeting Link',
+        'description': 'Meeting Description',
         }
+        
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(GroupStudyForm, self).__init__(*args, **kwargs)
+
+        if user:
+            enrollments = Enrollment.objects.filter(student=user)
+            enrolled_courses = [enrollment.course for enrollment in enrollments]
+            self.fields['course'].queryset = Course.objects.filter(id__in=[course.id for course in enrolled_courses])
+        
+        # Explicitly mark certain fields as not required
+        self.fields['meeting_type'].required = False
+        self.fields['location'].required = False
+        self.fields['meeting_link'].required = False
+        self.fields['description'].required = False
+
+    
 
 
 

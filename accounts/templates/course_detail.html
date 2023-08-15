@@ -2,40 +2,157 @@
 {% load static %}
 {% block content %}
 
-<div class="col-md-6 offset-md-3">
-<h1>{{ course.title }}</h1>
-<form method="POST">
-    {% csrf_token %}
-    {% if user.is_authenticated and user != course.creator %}
-        {% if course in user.enrolled_courses.all %}
-        <button 
-            class="btn btn-outline-danger" 
-            name="enrollment"
-            value="unenroll" 
-            type="submit">Unenroll from {{ course.title }} 
-        </button>
-    {% else %}
-        <button 
-            class="btn btn-outline-success" 
-            name="enrollment"
-            value="enroll" 
-            type="submit">Enroll in {{ course.title }} 
-        </button>
-    {% endif %}
-{% elif not user.is_authenticated %}
-    <a href="{% url 'login' %}" class="btn btn-outline-primary">Login to Enroll</a>
-    {% endif %}
-<br/><br/>
-</form>
-<td align="right">
-    <div>
-        <a href="{% url 'update_course' course.id %}" class="btn btn-outline-secondary"> Update Course </a>
+<div class="container">
+    <h1>Course Details</h1>
+    <div class="row">
+        <div class="d-grid gap-2 col-12 mx-auto">
+            {% if user in course.likes.all %}   
+                <a href="{% url 'course_like' course.id %}">
+                    <button class="btn btn-info"
+                    type="button">Liked</button>
+                </a>
+            {% else %}
+                <a href="{% url 'course_like' course.id %}">
+                    <button class="btn btn-outline-info"
+                    type="button">Like</button>
+                </a>
+            {% endif %}
+            <div class="col-8">
+                {% if course.number_of_likes == 1 %}
+                    1 Like
+                {% elif course.number_of_likes > 1 %}
+                    {{course.number_of_likes}} Likes
+                {% endif %}
+            </div>
+            {% if user in course.favorites.all %}
+                <a href="{% url 'course_favorite' course.id %}">
+                    <button class="btn btn-warning" style="text-decoration: none;"
+                    type="button">Favorited</button>
+                </a>
+            {% else %}
+                <a href="{% url 'course_favorite' course.id %}">
+                    <button class="btn btn-outline-warning" style="text-decoration: none;"
+                    type="button">Favorite</button>
+                </a>
+            {% endif %}
+            <div class="col-8">
+                {% if course.number_of_favorites == 1 %}
+                    1 Favorite
+                {% elif course.number_of_favorites > 1 %}
+                    {{course.number_of_favorites}} Favorites
+                {% endif %}
+            </div>
+        </div>
     </div>
-    <br/>
-    <div>
-        <a href="{% url 'delete_course' course.id %}" class="btn btn-outline-danger">Delete Course</a>
+        <br/>
+        <br/>    
+    <div class="row">
+        <div class="card" style="width: 30rem;">
+            {% if course.course_image %}
+                <img src="{{ course.course_image.url }}" class="card-img-top" alt="">
+            {% else %}
+                <img src="{% static 'images/generic_profile_pic2.png' %}" class="img-fluid rounded-start" alt="Profile Picture">
+            {% endif %}
+        </div> 
+        <div class="col-1">
+        </div>
+        <div class="col-6">
+            <div class="card border-success mb-3" style="max-width: 35rem;">
+                <div class="card-header bg-transparent border-success">
+                    <h5 class="card-title text-center">{{ course.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><strong>Start Date: </strong> {{ course.start_date }}</p>
+                    <p class="card-text"><strong>Subject:</strong> {{ course.subject }}</p>
+                    <p class="card-text"><strong>Level:</strong> {{ course.level_of_difficulty }}</p>
+                    {% if course.duration_in_weeks %}
+                    <p class="card-text"><strong>Length:</strong> {{ course.duration_in_weeks }} weeks </p>
+                    {% endif %}
+                    <p class="card-text"><strong>Number of Students Enrolled:</strong> 
+                        {{ enrolled_students_count }}
+                    </p>
+                    {% if course.max_students %}
+                    <p class="card-text"><strong>Max Students:</strong> {{ course.max_students }}</p>
+                    {% else %}
+                    <p class="card-text"><strong>Max Students :</strong> Unlimited </p>
+                    {% endif %}
+                    {% if course.frequesncy %}
+                    <p class="card-text"><strong>Weekly Meets:</strong> {{ course.frequesncy }}</p>
+                    {% endif %}
+                    <p class="card-text"><strong>Details:</strong> {{ course.description }}</p>
+                </div>
+                {% if course.open_enrollment %}
+                    <div class="card-footer bg-transparent border-success
+                    text-success text-center">Open Enrollment</div>
+                {% else %}
+                    <div class="card-footer bg-transparent border-success
+                    text-danger text-center">Enrollment Closed</div>
+                {% endif %}
+            </div>
+        </div>
     </div>
-</td>
-  
 </div>
+<<<<<<< HEAD
 {% endblock %}
+=======
+
+<div class="row">
+    <br/>
+</div>
+<div class="row">
+    <div class="col-3">
+        <form method="POST" action="{% url 'course_enrollment' course.pk %}">
+            {% csrf_token %}
+            {% if user.is_authenticated and user != course.creator %}
+                {% if course in user.enrolled_courses.all %}
+                    <div>
+                        <button type="submit"
+                                class="btn btn-outline-danger" 
+                                name="enrollment" 
+                                value="unenroll">Unenroll
+                        </button>
+                    </div>
+                    <br/>
+                    <div>
+                        <a href="{% url 'course_comments' course.id %}" 
+                        class="btn btn-outline-secondary">View/Post Comments</a>
+                    </div>
+                {% else %}
+                    <div>
+                        <button 
+                            type="submit"
+                            class="btn btn-outline-success" 
+                            name="enrollment" 
+                            value="enroll">Enroll
+                        </button>
+                    </div>
+                    <br/>
+                    <div>
+                        <a href="{% url 'course_comments' course.id %}" 
+                        class="btn btn-outline-secondary">View/Post Comments</a>
+                    </div>
+                {% endif %}
+            {% elif user.enrolled_courses.all and user == course.creator %}
+                <td align="right">
+                    <div>
+                        <a href="{% url 'update_course' course.id %}" 
+                        class="btn btn-outline-secondary"> Update Course </a>
+                    </div>
+                    <br/>
+                    <div>
+                        <a href="{% url 'delete_course' course.id %}" 
+                        class="btn btn-outline-danger">Delete Course</a>
+                    </div>
+                </td>
+            {% elif not user.is_authenticated %}
+                <div>
+                    <a href="{% url 'login' %}" 
+                    class="btn btn-outline-primary">Login to Enroll</a>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+<br/><br/>
+{% endblock %}
+>>>>>>> enroll_fix
