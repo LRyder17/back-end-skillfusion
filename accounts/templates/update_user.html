@@ -4,14 +4,34 @@
 <div class="col-md-6 offset-md-3">
     <h1>Update Profile</h1>
     <br/>
-    <form method ="POST" action="" enctype="multipart/form-data">
+    <form method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ profile_form.as_p}}
         <br/>
+        <strong>{{ profile_form.profile_image.label_tag }}</strong>
+        {{ profile_form.profile_image }}
+        <br/>
+        {{ profile_form.about_me.label_tag }}
+        {{ profile_form.about_me }}
+        <br/>
+
+        <strong>{{ profile_form.interested_categories.label_tag }}</strong>
+        <div class="row">
+            {% with categories=profile_form.interested_categories.field.queryset.all %}
+                {% for category in categories %}
+                    <div class="col-md-3">
+                        <label>
+                            <input type="checkbox" name="{{ profile_form.interested_categories.name }}" value="{{ category.id }}"
+                            {% if category in profile_form.interested_categories.value %}checked{% endif %}>
+                            {{ category }}
+                        </label>
+                    </div>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
         {{ user_form.as_p }}
         <br/>
         <button type="submit" class="btn btn-outline-primary">Update</button>
     </form>
-    
-    </div>
+</div>
 {% endblock %}
