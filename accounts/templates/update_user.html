@@ -16,15 +16,17 @@
         <strong>{{ profile_form.interested_categories.label_tag }}</strong>
         <div class="row">
             {% with categories=profile_form.interested_categories.field.queryset.all %}
-                {% for category in categories %}
-                    <div class="col-md-3">
-                        <label>
-                            <input type="checkbox" name="{{ profile_form.interested_categories.name }}" value="{{ category.id }}"
-                            {% if category in profile_form.interested_categories.value %}checked{% endif %}>
-                            {{ category }}
-                        </label>
-                    </div>
-                {% endfor %}
+                {% with selected_categories=profile_form.instance.interested_categories.all %}
+                    {% for category in categories %}
+                        <div class="col-md-3">
+                            <label>
+                                <input type="checkbox" name="{{ profile_form.interested_categories.name }}" value="{{ category.id }}"
+                                {% if category in selected_categories %}checked{% endif %}>
+                                {{ category }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% endwith %}
             {% endwith %}
         </div>
     </br/>

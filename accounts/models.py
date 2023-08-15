@@ -135,21 +135,6 @@ class Course(models.Model):
         return self.title if self.title else 'No Title'
 
 
-class Enrollment(models.Model):
-    course=models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrolled_courses')
-    student=models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrolled_students')
-    enrolled_time=models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name_plural="Enrolled Courses"
-    
-    def save(self, *args, **kwargs):
-        super(Enrollment, self).save(*args, **kwargs)
-        self.course.check_max_students()
-    
-    def __str__(self):
-        return f"{self.student} enrolled in {self.course}"
-
 # **************************** Class Meeting Modles *****************
     
 class GroupStudyMeeting(models.Model):
@@ -198,6 +183,26 @@ class GroupStudyMeeting(models.Model):
     
     def __str__(self):
         return f"{self.course.title} - {self.date} - {self.start_time}"
+    
+class StudyRequestAcceptance(models.Model):
+    study_request = models.ForeignKey(GroupStudyMeeting, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, 
+                               related_name='study_request_acceptances', 
+                               null=True) 
+    accepted = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural="Study Request Acceptances"
+        unique_together = ('study_request', 'user')
+    
+    def __str__(self):
+        return f"{self.user.username} accepted study request for {self.study_request.course.title}"
+
+    def save(self, *args, **kwargs):
+        if not self.course:
+            self.course = self.study_request.course
+        super(StudyRequestAcceptance, self).save(*args, **kwargs)
 
 
 class Enrollment(models.Model):
@@ -242,22 +247,3 @@ class Comment(models.Model):
             f"{self.body}..."
         )
 
-class StudyRequestAcceptance(models.Model):
-    study_request = models.ForeignKey(GroupStudyMeeting, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, 
-                               related_name='study_request_acceptances', 
-                               null=True) 
-    accepted = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name_plural="Study Request Acceptances"
-        unique_together = ('study_request', 'user')
-    
-    def __str__(self):
-        return f"{self.user.username} accepted study request for {self.study_request.course.title}"
-
-    def save(self, *args, **kwargs):
-        if not self.course:
-            self.course = self.study_request.course
-        super(StudyRequestAcceptance, self).save(*args, **kwargs)

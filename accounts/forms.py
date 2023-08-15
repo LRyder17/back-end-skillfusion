@@ -48,20 +48,29 @@ class UserRegistrationForm(UserCreationForm):
         self.fields['password2'].label = ''
         self.fields['password2'].help_text = '<span class="form-text text-muted small">Enter the same password for. They must be exactly the same.'
 
-class ProfileForm(forms.ModelForm):
-    profile_image = forms.ImageField(label="Profile Picture")
-    about_me = forms.CharField(widget=forms.Textarea, validators=[MaxLengthValidator(500)])
+class ProfilePicForm(forms.ModelForm):
+    profile_image = forms.ImageField(label="Profile Picture", required=False)
+    about_me = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Tell us something about yourself...'}),
+        validators=[MaxLengthValidator(500)],
+        required=False 
+    )
     interested_categories = forms.ModelMultipleChoiceField(
         queryset=CourseCategory.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
         required=False,
         label="Areas of Interest"
     )
-    instagram_link = forms.CharField(label="", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Instagram Link'}))
+    instagram_link = forms.CharField(
+        label="",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Instagram Link'}),
+        required=False
+    )
 
     class Meta:
         model = Profile
         fields = ('profile_image', 'about_me', 'instagram_link', 'interested_categories')
+
 
 class CourseForm(forms.ModelForm):
     course_image = forms.ImageField(label="Course Image", required=False)
@@ -160,9 +169,3 @@ class GroupStudyForm(forms.ModelForm):
         self.fields['location'].required = False
         self.fields['meeting_link'].required = False
         self.fields['description'].required = False
-
-    
-
-
-
-
