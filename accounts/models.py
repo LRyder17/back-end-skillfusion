@@ -5,9 +5,20 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 
+class CourseCategory(models.Model):
+    title=models.CharField(max_length=100, null=True, blank=True)
+    description=models.TextField(null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural= "Course Categories"
+
+    def __str__(self):
+        return self.title
+    
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     about_me = models.TextField(null=True, blank=True)
+    interested_categories = models.ManyToManyField(CourseCategory, blank=True)
     is_teacher = models.BooleanField(default=False)
     follows = models.ManyToManyField("self",
                                     related_name="followed_by",
@@ -41,15 +52,6 @@ def create_profile(sender, instance, created, **kwargs):
 
 post_save.connect(create_profile, sender=User)
 
-class CourseCategory(models.Model):
-    title=models.CharField(max_length=100, null=True, blank=True)
-    description=models.TextField(null=True, blank=True)
-
-    class Meta:
-        verbose_name_plural= "Course Categories"
-
-    def __str__(self):
-        return self.title
 
 class Course(models.Model):
     LEVEL_CHOICES = [

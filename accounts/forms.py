@@ -55,7 +55,7 @@ class ProfilePicForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('profile_image', 'about_me', 'instagram_link')
+        fields = ('profile_image', 'about_me', 'instagram_link', 'interested_categories')
 
 class CourseForm(forms.ModelForm):
     course_image = forms.ImageField(label="Course Image", required=False)
