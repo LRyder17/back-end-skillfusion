@@ -10,10 +10,9 @@
         <strong>{{ profile_form.profile_image.label_tag }}</strong>
         {{ profile_form.profile_image }}
         <br/>
-        {{ profile_form.about_me.label_tag }}
         {{ profile_form.about_me }}
         <br/>
-
+        <br/>
         <strong>{{ profile_form.interested_categories.label_tag }}</strong>
         <div class="row">
             {% with categories=profile_form.interested_categories.field.queryset.all %}
@@ -28,7 +27,7 @@
                 {% endfor %}
             {% endwith %}
         </div>
-
+    </br/>
         {{ user_form.as_p }}
         <br/>
         <button type="submit" class="btn btn-outline-primary">Update</button>
