@@ -117,9 +117,13 @@
                   <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
                         {% for course in enrolled_courses %}
-                            {{course.title}}
-                        {% empty %}
-                            Currently not enrolled in any courses.
+                            {% if course.teacher == profile.user %}
+                               - {{course.title}} <strong>(teacher)</strong><br/>
+                            {% else %}
+                               - {{course.title}}<br/>
+                            {% endif %}
+                            {% empty %}
+                                Currently not enrolled in any courses.
                         {% endfor %}
                     </div>
                   </div>
