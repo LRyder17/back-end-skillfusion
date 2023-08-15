@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.db.models import Q
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
+from django.http import HttpResponseRedirect
 from .google_auth import flow
 from oauth2client.client import OAuth2Credentials
 # from googleapiclient.discovery import build
@@ -12,7 +13,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .forms import CommentForm, UserRegistrationForm, ProfilePicForm, CourseForm, GroupStudyForm
+from .forms import CommentForm, UserRegistrationForm, ProfileForm, CourseForm, GroupStudyForm
 from django.contrib.auth.models import User
 from django.utils import timezone
 import calendar
@@ -34,30 +35,15 @@ def upload_to_s3(file):
     file_to_upload = BytesIO(content)
     s3.upload_fileobj(file_to_upload, 'skillfusion', 'images/' + file.name)
 
-def notes_text(request):
-    response = HttpResponse(content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename=class_notes.txt'
-
-    lines = ["Add your class notes here...\n",
-             "Course: \n",
-             "Date: \n", ]
-    
-    response.writelines(lines)
-    return response
-
-
-def course_comments(request, course_id):
-    course = get_object_or_404(Course, id=course_id)  # get the specific course or return 404 if not found
-
+def home(request):
     if request.user.is_authenticated:
         form = CommentForm(request.POST or None)
         if request.method == "POST":
             if form.is_valid():
                 comment = form.save(commit=False)
                 comment.user = request.user
-                comment.course = course  # associate the comment with the specific course
                 comment.save()
-                messages.success(request, "Your comment has been posted successfully!")
+                messages.success(request,("Your comment has been posted successfully!"))
                 return redirect(request.META.get("HTTP_REFERER"))
             
         comments = Comment.objects.all().order_by("-created_at")
@@ -65,8 +51,7 @@ def course_comments(request, course_id):
                                              "form": form})
     else:
         comments = []
-        return render(request, 'course_comments.html', {"comments": comments, "course": course})
-
+        return render(request, 'home.html', {"comments": comments})
 
     
 def profile(request, pk):
@@ -158,7 +143,6 @@ def comment_show(request, pk):
     else:
         messages.success(request, ("That Comment Does Not Exist!"))
         return redirect('home')
-
     
 def delete_comment(request, pk):
     if request.user.is_authenticated:
@@ -198,18 +182,6 @@ def course_comments(request, pk):
         return render(request, 'course_comments.html', {"course": course,
                                                         "comments": comments})
 
-    if request.method == "POST":
-        current_user_profile = request.user.profile
-        action = request.POST.get('follow')
-        if action == "unfollow":
-            current_user_profile.follows.remove(profile)
-        elif action == "follow":
-            current_user_profile.follows.add(profile)
-        current_user_profile.save()
-
-    return render(request, "profile.html", {"profile": profile, "comments": comments})
-
-    
 def create_course(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
@@ -320,21 +292,13 @@ def course_list(request, searched=None, course_filter=None):
 
 
 
-
 def courses_by_subject(request, subject):
     course_list = Course.objects.filter(subject=subject)
-    no_courses_found = not course_list.exists()
-
-    return render(request, 'course_list.html', {'course_list': course_list, 
-                                                'no_courses_found': no_courses_found})
-
+    return render(request, 'course_list.html', {'course_list': course_list})
 
 def courses_by_category(request, category_id):
     course_list = Course.objects.filter(category_id=category_id)
-    no_courses_found = not course_list.exists()
-
-    return render(request, 'course_list.html', {'course_list': course_list, 
-                                                'no_courses_found': no_courses_found})
+    return render(request, 'course_list.html', {'course_list': course_list})
 
 def my_courses(request):
     if request.user.is_authenticated:
@@ -351,15 +315,7 @@ def update_course(request, course_id):
     if form.is_valid():
         form.save()
         return redirect('course_list')
-    
-    context = {
-        'course': course,
-        'form': form,
-        'previous_page': reverse('my_courses')
-    }
-
-    return render(request, 'update_course.html', context)
-
+    return render(request, 'update_course.html', {'course': course, 'form': form})
 
 
 def delete_course(request, pk):
@@ -488,7 +444,7 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request,("You have been logged in!"))
-            return redirect(reverse('profile', kwargs={'pk': request.user.profile.pk}))
+            return redirect('home')
         else:
             messages.success(request,("There was an error loggin in. Please try again!"))
             return redirect('login')
@@ -497,7 +453,7 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     messages.success(request,("You have been logged out successfully!"))
-    return redirect('login')
+    return redirect('home')
 
 def register_user(request):
     form = UserRegistrationForm()
@@ -536,11 +492,6 @@ def update_user(request):
 
             messages.success(request, ("Your profile information has been updated"))
             return redirect(reverse('profile', kwargs={'pk': request.user.profile.pk}))
-        
-        context = {'user_form': user_form, 
-                   'profile_form': profile_form,
-                   'profile_url': reverse('profile', kwargs={'pk': request.user.profile.pk})
-                   }
 
         return render(request, "update_user.html", {'user_form': user_form, 
                                                     'profile_form': profile_form})
@@ -564,4 +515,3 @@ def calendar_view(request, year=datetime.now().year, month=datetime.now().strfti
                    'month': month,
                    'cal': cal,
                   })
-    

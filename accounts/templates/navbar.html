@@ -1,70 +1,66 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      {% comment %} <a class="navbar-brand" href="{% url 'course_comments'%}">Skill Fusion</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button> {% endcomment %}
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url 'course_list' %}">Courses</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" 
-            href="{% url 'profile_list' %}">Profile List</a>
-          </li>
-          {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link" 
-            href="{% url 'profile' request.user.id %}">My Profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" 
-            href="{% url 'logout' %}">Logout</a>
-          </li>
-          {% else %}
-          <li class="nav-item">
-            <a class="nav-link" 
-            href="{% url 'login' %}">Login</a>
-          </li>
-          <li class="nav-item"> 
-            <a class="nav-link" 
-              href="{% url 'register' %}">Register</a>
-          </li>
-          {% endif %}
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">Skill Fusion</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'course_list' %}">Courses</a>
+        </li>
 
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Course & Study Management
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'my_courses' %}">My Courses</a></li>
-              <li><a class="dropdown-item" href=" {% url 'create_course' %}">Add Course</a></li>
-              <li><a class="dropdown-item" href="{% url 'notes_text' %}">My Notes</a></li>
-              <li><hr class="dropdown-divider"></li>
-<<<<<<< HEAD
-              <li><a class="dropdown-item" href="{% url 'group_study_request' %}">Create Study Request</a></li>
-=======
-              <li><a class="dropdown-item" href="{% url 'my_study_requests' %}">View Study Requests</a></li>
-              <li><a class="dropdown-item" href="{% url 'group_study_request' %}">Make Study Request</a></li>
->>>>>>> enroll_fix
-            </ul>
-          </li>
-        </ul>
-        <form class="d-flex" method="POST" action="{% url 'search_courses' %}" role="search"> 
-          {% csrf_token %}
-          <input class="form-control me-2" type="search" placeholder="Search" 
-          aria-label="Search" name="searched">
-          <select class="form-select me-2" name="course_filter">
-            <option value="both">Any Course</option>
-            <option value="teacher">Teacher Led</option>
-            <option value="student">Student Led</option>
-            <option value="B">Beginner</option>
-            <option value="I">Intermediate</option>
-            <option value="A">Advanced</option>
-        </select>
-          <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-      </div>
+        <li class="nav-item">
+          <a class="nav-link" 
+          href="{% url 'profile_list' %}">Profile List</a>
+        </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" 
+          href="{% url 'profile' request.user.id %}">My Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" 
+          href="{% url 'logout' %}">Logout</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" 
+          href="{% url 'login' %}">Login</a>
+        </li>
+        <li class="nav-item"> 
+          <a class="nav-link" 
+            href="{% url 'register' %}">Register</a>
+        </li>
+        {% endif %}
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Course & Study Management
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'my_courses' %}">My Courses</a></li>
+            <li><a class="dropdown-item" href=" {% url 'create_course' %}">Add Course</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'my_study_requests' %}">View Study Requests</a></li>
+            <li><a class="dropdown-item" href="{% url 'group_study_request' %}">Make Study Request</a></li>
+          </ul>
+        </li>
+      </ul>
+      <form class="d-flex" method="POST" action="{% url 'search_courses' %}" role="search"> 
+        {% csrf_token %}
+        <input class="form-control me-2" type="search" placeholder="Search" 
+        aria-label="Search" name="searched">
+        <select class="form-select me-2" name="course_filter">
+          <option value="both">Any Course</option>
+          <option value="teacher">Teacher Led</option>
+          <option value="student">Student Led</option>
+          <option value="B">Beginner</option>
+          <option value="I">Intermediate</option>
+          <option value="A">Advanced</option>
+      </select>
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
     </div>
-  </nav>
+  </div>
+</nav>
