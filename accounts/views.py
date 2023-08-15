@@ -23,15 +23,6 @@ from django.core.files.base import ContentFile
 import boto3
 from io import BytesIO
 
-# def upload_to_s3(file):
-#     s3 = boto3.client('s3')
-#     if file.multiple_chunks():
-#         content = b''.join(chunk for chunk in file.chunks())
-#     else:
-#         content = file.read()
-#     file_to_upload = ContentFile(content)
-#     s3.upload_fileobj(file_to_upload, 'skillfusion', 'images/')
-
 
 # if errors occur try changing 'skillfusion' to 'skillfusion-bucket'
 def upload_to_s3(file):
@@ -218,30 +209,6 @@ def create_course(request):
         messages.success(request, ("You must be logged in to add a course!"))
         return redirect('login')
 
-# def course_detail(request, pk):
-#     course = get_object_or_404(Course, pk=pk)
-#     enrolled_students_count = course.enrolled_courses.count()
-
-#     # can_enroll = False
-#     if request.user.is_authenticated:
-#         # Enrollment logic
-#         if request.method == "POST":
-#             action = request.POST.get('enrollment')
-#             if action == "unenroll":
-#                 Enrollment.objects.filter(course=course, student=request.user).delete()
-#                 course.students.remove(request.user)
-#             elif action == "enroll":
-#                 Enrollment.objects.create(course=course, 
-#                                           student=request.user, 
-#                                           enrolled_time=timezone.now())
-#                 course.students.add(request.user)
-#             course.save()
-
-#         return render(request, "course_detail.html", {"course": course, 
-#                                                       "enrolled_students_count": enrolled_students_count})
-#     else:
-#         return render(request, "course_detail.html", {"course": course})
-
 def course_detail(request, pk):
     course = get_object_or_404(Course, pk=pk)
     enrolled_students_count = course.enrolled_courses.count()
@@ -276,29 +243,54 @@ def course_enrollment(request, pk):
 
     return redirect('course_detail', pk=pk)
 
-# def course_list(request):
-#     course_list = Course.objects.all()
-#     return render(request, 'course_list.html', {'course_list': course_list})
 
 def search_courses(request):
     if request.method == "POST":
-        searched = request.POST['searched']
-        return redirect('course_list_searched', searched=searched)
-    else:
-        return render(request, 'search_courses.html', {})
+        searched = request.POST['searched'].strip()
 
-def course_list(request, searched=None):
-    if searched:
-        course_list = Course.objects.filter(
-            Q(title__icontains=searched) | 
-            Q(category__title__icontains=searched) | 
-            Q(subject__icontains=searched) |
-            Q(teacher__username__icontains=searched) |
-            Q(level_of_difficulty__icontains=searched)
-    )
+        course_filter = request.POST.get('course_filter', None)
+
+        if not searched:
+            searched = None
+
+        if searched and not course_filter:
+            return redirect('course_list_searched', searched=searched)
+        elif course_filter and not searched:
+            return redirect('course_list_filter', course_filter=course_filter)
+        elif searched and course_filter:
+            return redirect('course_list_searched_filter', searched=searched, course_filter=course_filter)
+        else:
+            return redirect('course_list')
+
     else:
-        course_list = Course.objects.all()
+        return redirect('course_list')
+
+
+def course_list(request, searched=None, course_filter=None):
+    base_query = Q()
+
+    if course_filter not in [None, "teacher", "student", "Beginner", "Intermediate", "Advanced"]:
+        course_filter = None
+
+    if searched:
+        base_query = Q(title__icontains=searched) | \
+                    Q(category__title__icontains=searched) | \
+                    Q(subject__icontains=searched) | \
+                    Q(teacher__username__icontains=searched) | \
+                    Q(level_of_difficulty__icontains=searched)
+    
+    if course_filter == "teacher":
+        course_list = Course.objects.filter(base_query & Q(teacher__isnull=False))
+    elif course_filter == "student":
+        course_list = Course.objects.filter(base_query & Q(teacher__isnull=True))
+    elif course_filter in ["B", "I", "A"]:
+        course_list = Course.objects.filter(base_query & Q(level_of_difficulty=course_filter))
+    else:
+        course_list = Course.objects.filter(base_query)
+    
     return render(request, 'course_list.html', {'course_list': course_list, 'searched': searched})
+
+
 
 def courses_by_subject(request, subject):
     course_list = Course.objects.filter(subject=subject)
@@ -324,15 +316,6 @@ def update_course(request, course_id):
         form.save()
         return redirect('course_list')
     return render(request, 'update_course.html', {'course': course, 'form': form})
-
-# def search_courses(request):
-#     if request.method == "POST":
-#         searched = request.POST['searched']
-#         courses = Course.objects.filter(title__contains=searched)
-#         return render(request, 'search_courses.html', {'searched': searched,
-#                                                        'courses': courses})
-#     else:
-#         return render(request, 'search_courses.html', {})
 
 
 def delete_course(request, pk):

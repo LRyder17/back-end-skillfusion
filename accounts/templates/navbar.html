@@ -51,6 +51,14 @@
           {% csrf_token %}
           <input class="form-control me-2" type="search" placeholder="Search" 
           aria-label="Search" name="searched">
+          <select class="form-select me-2" name="course_filter">
+            <option value="both">Any Course</option>
+            <option value="teacher">Teacher Led</option>
+            <option value="student">Student Led</option>
+            <option value="B">Beginner</option>
+            <option value="I">Intermediate</option>
+            <option value="A">Advanced</option>
+        </select>
           <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
       </div>

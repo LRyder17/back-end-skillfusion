@@ -26,6 +26,9 @@
             <div class="card-body">
               <h5 class="card-title"> <strong>{{course.title}}</strong></h5>
               <p class="card-text"><strong>Course Subject</strong>: {{ course.subject }}</p>
+              {% if course.level_of_difficulty%}
+              <p class="card-text"><strong>Level</strong>: {{ course.level_of_difficulty }}</p>
+              {% endif %}
               <p class="card-text">
                 <small class="text-body-primary">
                   {% if course.open_enrollment %}

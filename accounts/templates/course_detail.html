@@ -64,9 +64,22 @@
                 <div class="card-body">
                     <p class="card-text"><strong>Start Date: </strong> {{ course.start_date }}</p>
                     <p class="card-text"><strong>Subject:</strong> {{ course.subject }}</p>
-                    <p class="card-text"><strong>Details:</strong> {{ course.description }}</p>
+                    <p class="card-text"><strong>Level:</strong> {{ course.level_of_difficulty }}</p>
+                    {% if course.duration_in_weeks %}
+                    <p class="card-text"><strong>Length:</strong> {{ course.duration_in_weeks }} weeks </p>
+                    {% endif %}
                     <p class="card-text"><strong>Number of Students Enrolled:</strong> 
-                        {{ enrolled_students_count }}</p>
+                        {{ enrolled_students_count }}
+                    </p>
+                    {% if course.max_students %}
+                    <p class="card-text"><strong>Max Students:</strong> {{ course.max_students }}</p>
+                    {% else %}
+                    <p class="card-text"><strong>Max Students :</strong> Unlimited </p>
+                    {% endif %}
+                    {% if course.frequesncy %}
+                    <p class="card-text"><strong>Weekly Meets:</strong> {{ course.frequesncy }}</p>
+                    {% endif %}
+                    <p class="card-text"><strong>Details:</strong> {{ course.description }}</p>
                 </div>
                 {% if course.open_enrollment %}
                     <div class="card-footer bg-transparent border-success

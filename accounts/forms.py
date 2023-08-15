@@ -51,10 +51,11 @@ class UserRegistrationForm(UserCreationForm):
 class ProfilePicForm(forms.ModelForm):
     profile_image = forms.ImageField(label="Profile Picture")
     about_me = forms.CharField(widget=forms.Textarea, validators=[MaxLengthValidator(500)])
+    instagram_link = forms.CharField(label="", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Instagram Link'}))
 
     class Meta:
         model = Profile
-        fields = ('profile_image', 'about_me')
+        fields = ('profile_image', 'about_me', 'instagram_link')
 
 class CourseForm(forms.ModelForm):
     course_image = forms.ImageField(label="Course Image", required=False)

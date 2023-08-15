@@ -17,6 +17,7 @@ class Profile(models.Model):
     profile_image = models.ImageField(null=True, blank=True, upload_to="images/")
     access_token = models.CharField(max_length=500, null=True, blank=True)
     refresh_token = models.CharField(max_length=500, null=True, blank=True)
+    instagram_link = models.CharField(null=True, blank=True, max_length=100)
 
     @property
     def enrolled_courses(self):
@@ -25,8 +26,7 @@ class Profile(models.Model):
     @property
     def teaching_courses(self):
         return ", ".join([course.title for course in self.user.teaching_courses.all()])
-
-    
+ 
     def __str__(self):
         return self.user.username
     
@@ -53,9 +53,9 @@ class CourseCategory(models.Model):
 
 class Course(models.Model):
     LEVEL_CHOICES = [
-        ('B', 'Beginner'),
-        ('I', 'Intermediate'),
-        ('A', 'Advanced'),
+        ('Beginner', 'Beginner'),
+        ('Intermediate', 'Intermediate'),
+        ('Advanced', 'Advanced'),
     ]
 
     teacher = models.ForeignKey(
@@ -88,7 +88,7 @@ class Course(models.Model):
     subject = models.CharField(max_length=200)
     description = models.TextField(default="")
     level_of_difficulty = models.CharField(null=True, blank=True, 
-                                           max_length=1, choices=LEVEL_CHOICES)
+                                           max_length=13, choices=LEVEL_CHOICES)
     duration_in_weeks = models.PositiveIntegerField(
                                                     null=True, blank=True, 
                                                     help_text="Enter length of the course in weeks.")
