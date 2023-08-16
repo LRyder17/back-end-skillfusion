@@ -262,10 +262,6 @@ def search_courses(request):
         else:
             return redirect('course_list')
 
-    else:
-        return redirect('course_list')
-
-
 def course_list(request, searched=None, course_filter=None):
     base_query = Q()
 
@@ -283,12 +279,14 @@ def course_list(request, searched=None, course_filter=None):
         course_list = Course.objects.filter(base_query & Q(teacher__isnull=False))
     elif course_filter == "student":
         course_list = Course.objects.filter(base_query & Q(teacher__isnull=True))
-    elif course_filter in ["B", "I", "A"]:
+    elif course_filter in ["Beginner", "Intermediate", "Advanced"]:
         course_list = Course.objects.filter(base_query & Q(level_of_difficulty=course_filter))
     else:
         course_list = Course.objects.filter(base_query)
     
     return render(request, 'course_list.html', {'course_list': course_list, 'searched': searched})
+
+
 
 
 

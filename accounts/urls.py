@@ -34,9 +34,9 @@ urlpatterns = [
     path('courses/subject/<str:subject>/', views.courses_by_subject, name='courses_by_subject'),
     path('courses/category/<int:category_id>/', views.courses_by_category, name='courses_by_category'),
     path('search_courses/', views.search_courses, name='search_courses'),
-    path('courses/<str:searched>/<str:course_filter>/', views.course_list, name='course_list_searched_filter'),
-    path('courses/<str:searched>/', views.course_list, name='course_list_searched'),
-    path('courses/<str:course_filter>/', views.course_list, name='course_list_filter'),
+   path('courses/searched=<str:searched>&filter=<str:course_filter>/', views.course_list, name='course_list_searched_filter'),
+    path('courses/filter=<str:course_filter>/', views.course_list, name='course_list_filter'),
+    path('courses/searched=<str:searched>/', views.course_list, name='course_list_searched'),
     path('my_courses/', views.my_courses, name='my_courses'),
 
     # Study Request Views
