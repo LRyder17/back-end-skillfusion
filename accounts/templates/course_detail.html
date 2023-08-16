@@ -51,7 +51,7 @@
             {% if course.course_image %}
                 <img src="{{ course.course_image.url }}" class="card-img-top" alt="">
             {% else %}
-                <img src="{% static 'images/generic_profile_pic2.png' %}" class="img-fluid rounded-start" alt="Profile Picture">
+                <img src="{% static 'images/skillfusion.png' %}" class="img-fluid rounded-start" alt="Course Picture">
             {% endif %}
         </div> 
         <div class="col-1">
@@ -110,7 +110,7 @@
                         </button>
                     </div>
                     <br/>
-                {% else %}
+                {% elif course.open_enrollment %}
                     <div>
                         <button 
                             type="submit"
