@@ -113,7 +113,9 @@ def comment_like(request, pk):
             comment.likes.remove(request.user)
         else:
             comment.likes.add(request.user)
-    
+        return redirect(request.META.get("HTTP_REFERER"))
+    else:
+        messages.success(request, ("Please log in to like course."))
         return redirect(request.META.get("HTTP_REFERER"))
     
 def course_like(request, pk):
@@ -125,6 +127,10 @@ def course_like(request, pk):
             course.likes.add(request.user)
     
         return redirect(request.META.get("HTTP_REFERER"))
+    else:
+        messages.success(request, ("Please log in to like course."))
+        return redirect(request.META.get("HTTP_REFERER"))
+
 
 def course_favorite(request, pk):
     if request.user.is_authenticated:
@@ -223,7 +229,7 @@ def course_detail(request, pk):
     
 def course_enrollment(request, pk):
     if not request.user.is_authenticated:
-        return redirect('name_of_login_page')
+        return redirect('login')
 
     course = get_object_or_404(Course, pk=pk)
 
@@ -285,9 +291,6 @@ def course_list(request, searched=None, course_filter=None):
         course_list = Course.objects.filter(base_query)
     
     return render(request, 'course_list.html', {'course_list': course_list, 'searched': searched})
-
-
-
 
 
 def courses_by_subject(request, subject):
