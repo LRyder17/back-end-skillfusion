@@ -53,6 +53,10 @@
             {% else %}
                 <img src="{% static 'images/skillfusion.png' %}" class="img-fluid rounded-start" alt="Course Picture">
             {% endif %}
+            {% if course.teacher %}
+            Taught by: <a href="{% url 'profile' course.creator.id %}">
+                @{{ course.creator.username|lower }}</a>
+            {% endif %}
         </div> 
         <div class="col-1">
         </div>
