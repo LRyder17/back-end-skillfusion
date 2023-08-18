@@ -141,6 +141,9 @@ def course_favorite(request, pk):
             course.favorites.add(request.user)
     
         return redirect(request.META.get("HTTP_REFERER"))
+    else:
+        messages.success(request, ("Please log in to favorite course."))
+        return redirect(request.META.get("HTTP_REFERER"))
 
 def comment_show(request, pk):
     comment = get_object_or_404(Comment, id=pk)
